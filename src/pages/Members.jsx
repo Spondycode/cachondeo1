@@ -1,6 +1,7 @@
 import React from 'react';
-import { FileText, Music, Download } from 'lucide-react';
+import { FileText, Music, Download, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 const Members = () => {
     const [songs, setSongs] = React.useState([]);
@@ -37,26 +38,40 @@ const Members = () => {
                             padding: '1.5rem 2rem'
                         }}
                     >
-                        <div style={{ flex: 1 }}>
-                            <h3 style={{ fontSize: '1.3rem', marginBottom: '0.2rem', color: 'var(--secondary)' }}>{song.title}</h3>
-                            <p style={{ color: 'var(--accent)', fontSize: '0.9rem', marginBottom: '0.8rem', fontWeight: '500' }}>{song.composer}</p>
+                        <Link to={`/members/song/${song.id}`} style={{ flex: 1, textDecoration: 'none', display: 'block' }}>
+                            <div style={{ cursor: 'pointer' }}>
+                                <h3 style={{ fontSize: '1.3rem', marginBottom: '0.2rem', color: 'var(--secondary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    {song.title} <ChevronRight size={18} style={{ opacity: 0.5 }} />
+                                </h3>
+                                <p style={{ color: 'var(--accent)', fontSize: '0.9rem', marginBottom: '0.8rem', fontWeight: '500' }}>{song.composer}</p>
 
-                            {song.description && (
-                                <div style={{
-                                    background: 'rgba(52, 152, 219, 0.05)',
-                                    padding: '0.8rem',
-                                    borderRadius: '4px',
-                                    fontSize: '0.85rem',
-                                    color: 'var(--text-muted)',
-                                    marginBottom: '1rem',
-                                    borderLeft: '3px solid var(--accent)',
-                                    lineHeight: '1.4'
-                                }}>
-                                    {song.description}
-                                </div>
-                            )}
+                                {song.description && (
+                                    <div style={{
+                                        background: 'rgba(52, 152, 219, 0.05)',
+                                        padding: '0.8rem',
+                                        borderRadius: '4px',
+                                        fontSize: '0.85rem',
+                                        color: 'var(--text-muted)',
+                                        marginBottom: '1rem',
+                                        borderLeft: '3px solid var(--accent)',
+                                        lineHeight: '1.4'
+                                    }}>
+                                        {song.description.length > 150 ? `${song.description.substring(0, 150)}...` : song.description}
+                                    </div>
+                                )}
+                            </div>
+                        </Link>
 
-                            {/* Part Tracks */}
+                        <div style={{ flex: 1, display: song.description || (song.sopranoAudio || song.altoAudio || song.tenorAudio || song.bassAudio) ? 'none' : 'block' }}>
+                            {/* Empty space if no description and no parts, to maintain layout if needed, 
+                                but actually we want the link to take precedence. 
+                                The logic above wrapped the whole info area. */}
+                        </div>
+
+                        <div style={{ flexBasis: '100%', display: 'none' }}></div> {/* Spacer for wrap if needed */}
+
+                        <div style={{ flex: 2 }}>
+                            {/* Part Tracks (Moved outside the link to ensure they work) */}
                             {(song.sopranoAudio || song.altoAudio || song.tenorAudio || song.bassAudio) && (
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
                                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', width: '100%', marginBottom: '0.2rem' }}>Practice Tracks:</span>

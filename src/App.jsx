@@ -10,6 +10,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import Admin from './pages/Admin';
 import EditSong from './pages/EditSong';
+import SongDetail from './pages/SongDetail';
 
 function App() {
   return (
@@ -26,6 +27,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Members />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/members/song/:id"
+                element={
+                  <ProtectedRoute>
+                    <SongDetail />
                   </ProtectedRoute>
                 }
               />
