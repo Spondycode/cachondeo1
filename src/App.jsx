@@ -11,6 +11,8 @@ import AdminRoute from './components/AdminRoute';
 import Admin from './pages/Admin';
 import EditSong from './pages/EditSong';
 import SongDetail from './pages/SongDetail';
+import RehearsalDetail from './pages/RehearsalDetail';
+import EditRehearsal from './pages/EditRehearsal';
 
 function App() {
   return (
@@ -39,6 +41,14 @@ function App() {
                 }
               />
               <Route
+                path="/rehearsal"
+                element={
+                  <ProtectedRoute>
+                    <RehearsalDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/admin"
                 element={
                   <AdminRoute>
@@ -51,6 +61,14 @@ function App() {
                 element={
                   <AdminRoute>
                     <EditSong />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/edit-rehearsal"
+                element={
+                  <AdminRoute>
+                    <EditRehearsal />
                   </AdminRoute>
                 }
               />

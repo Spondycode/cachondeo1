@@ -2,8 +2,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Music, MapPin, Users, Calendar, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
 
 const Home = () => {
+    const { user } = useAuth();
     return (
         <div className="home-page">
             {/* Hero Section */}
@@ -73,17 +75,22 @@ const Home = () => {
                             </p>
                         </motion.div>
 
-                        <motion.div
-                            whileHover={{ y: -10 }}
-                            className="glass-card"
-                            style={{ textAlign: 'center', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}
-                        >
-                            <Calendar color="var(--secondary)" size={40} style={{ marginBottom: '1.5rem' }} />
-                            <h3 style={{ marginBottom: '1rem' }}>Weekly Fun</h3>
-                            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                                Every Thursday at 7:00 PM at the Costa Brava Community Arts Center.
-                            </p>
-                        </motion.div>
+                        <Link to={user ? "/rehearsal" : "/login"} style={{ textDecoration: 'none', color: 'inherit' }}>
+                            <motion.div
+                                whileHover={{ y: -10 }}
+                                className="glass-card"
+                                style={{ textAlign: 'center', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', cursor: 'pointer' }}
+                            >
+                                <Calendar color="var(--secondary)" size={40} style={{ marginBottom: '1.5rem' }} />
+                                <h3 style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                                    Weekly Fun {user && <ArrowRight size={18} color="var(--accent)" />}
+                                </h3>
+                                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                                    Every Thursday at 7:00 PM at the Costa Brava Community Arts Center.
+                                </p>
+                                {user && <span style={{ fontSize: '0.75rem', color: 'var(--accent)', fontWeight: '600', marginTop: '1rem', display: 'block' }}>VIEW DETAILS</span>}
+                            </motion.div>
+                        </Link>
 
                         <motion.div
                             whileHover={{ y: -10 }}
