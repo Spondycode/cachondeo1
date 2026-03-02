@@ -13,6 +13,8 @@ import EditSong from './pages/EditSong';
 import SongDetail from './pages/SongDetail';
 import RehearsalDetail from './pages/RehearsalDetail';
 import EditRehearsal from './pages/EditRehearsal';
+import Profile from './pages/Profile';
+import PublicRepertoire from './pages/PublicRepertoire';
 
 function App() {
   return (
@@ -24,6 +26,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/repertoire" element={<PublicRepertoire />} />
               <Route
                 path="/members"
                 element={
@@ -45,6 +48,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <RehearsalDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <Profile />
                   </ProtectedRoute>
                 }
               />

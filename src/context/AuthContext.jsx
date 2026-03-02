@@ -69,10 +69,27 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('choir_user');
     };
 
+    const updateUserProfile = (updatedData) => {
+        // Update user state
+        const updatedUser = { ...user, ...updatedData };
+        setUser(updatedUser);
+        localStorage.setItem('choir_user', JSON.stringify(updatedUser));
+
+        // Also update in choir_members list for persistence across logins
+        const storedMembers = JSON.parse(localStorage.getItem('choir_members') || '[]');
+        const updatedMembers = storedMembers.map(m =>
+            m.email === user.email ? { ...m, ...updatedData } : m
+        );
+        localStorage.setItem('choir_members', JSON.stringify(updatedMembers));
+
+        return true;
+    };
+
     const value = {
         user,
         login,
         logout,
+        updateUserProfile,
         loading
     };
 

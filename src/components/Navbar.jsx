@@ -44,7 +44,17 @@ const Navbar = () => {
                                 <Link to="/admin" style={{ color: 'var(--secondary)', textDecoration: 'none', fontWeight: '600', fontSize: '0.9rem' }}>Admin</Link>
                             )}
                             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginLeft: '1rem', paddingLeft: '1rem', borderLeft: '1px solid var(--glass-border)' }}>
-                                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{user.name}</span>
+                                <Link to="/profile" style={{
+                                    fontSize: '0.8rem',
+                                    color: 'var(--text-muted)',
+                                    textDecoration: 'none',
+                                    transition: 'color 0.3s ease'
+                                }}
+                                    onMouseEnter={(e) => e.target.style.color = 'var(--secondary)'}
+                                    onMouseLeave={(e) => e.target.style.color = 'var(--text-muted)'}
+                                >
+                                    {user.name}
+                                </Link>
                                 <button onClick={handleLogout} className="btn-outline" style={{ padding: '0.5rem 1rem', fontSize: '0.8rem' }}>Logout</button>
                             </div>
                         </div>

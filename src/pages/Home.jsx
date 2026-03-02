@@ -45,7 +45,7 @@ const Home = () => {
                             Welcome to Cachondeo Choir. We are a high-energy community on the Costa Brava, bringing popular hits to life with sun, sea, and song.
                         </p>
                         <div style={{ display: 'flex', gap: '1.5rem' }}>
-                            <Link to="/login" className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <Link to="/repertoire" className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 Explore Repertoire <ArrowRight size={18} />
                             </Link>
                             <button className="btn-outline">Watch Our Story</button>
