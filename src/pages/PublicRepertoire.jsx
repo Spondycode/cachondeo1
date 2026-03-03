@@ -12,7 +12,7 @@ const PublicRepertoire = () => {
     }, []);
 
     return (
-        <div className="public-repertoire-page" style={{ minHeight: '100vh', backgroundColor: '#f0f7ff', padding: '120px 0 60px' }}>
+        <div className="public-repertoire-page" style={{ backgroundColor: '#f0f7ff', padding: '4rem 0' }}>
             <div className="container">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -71,11 +71,11 @@ const PublicRepertoire = () => {
                         )}
                     </div>
 
-                    <div style={{ marginTop: '4rem', padding: '3rem', borderRadius: '24px', background: 'var(--primary)', color: 'white', textAlign: 'center' }}>
+                    {/* <div style={{ marginTop: '4rem', padding: '3rem', borderRadius: '24px', background: 'var(--primary)', color: 'white', textAlign: 'center' }}>
                         <h2 style={{ marginBottom: '1rem' }}>Want to sing with us?</h2>
                         <p style={{ marginBottom: '2rem', opacity: 0.9 }}>Join our vibrant community and bring these hits to life!</p>
                         <Link to="/login" className="btn-secondary">Member Login</Link>
-                    </div>
+                    </div> */}
                 </motion.div>
             </div>
         </div>

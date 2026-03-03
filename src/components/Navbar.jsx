@@ -36,7 +36,7 @@ const Navbar = () => {
                 </Link>
 
                 <div style={{ display: 'flex', gap: '2rem', alignItems: 'center', color: 'var(--text-main)' }}>
-                    <Link to="/" style={{ fontSize: '0.9rem', fontWeight: '500' }}>Home</Link>
+                    {/* <Link to="/" style={{ fontSize: '0.9rem', fontWeight: '500' }}>Home</Link> */}
                     {user && (
                         <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
                             <Link to="/members" style={{ color: 'var(--text-main)', textDecoration: 'none', fontWeight: '500', fontSize: '0.9rem' }}>Members</Link>

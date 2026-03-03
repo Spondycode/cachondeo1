@@ -24,11 +24,14 @@ const Login = () => {
 
     return (
         <div style={{
-            minHeight: '80vh',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%)'
+            background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%)',
+            padding: '2rem 1rem',
+            width: '100%',
+            position: 'relative',
+            zIndex: 1
         }}>
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}

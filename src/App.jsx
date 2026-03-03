@@ -16,6 +16,7 @@ import EditRehearsal from './pages/EditRehearsal';
 import Profile from './pages/Profile';
 import PublicRepertoire from './pages/PublicRepertoire';
 import Attendance from './pages/Attendance';
+import AttendanceEdit from './pages/AttendanceEdit';
 
 function App() {
   return (
@@ -89,6 +90,14 @@ function App() {
                 element={
                   <AdminRoute>
                     <Attendance />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/attendance/:date"
+                element={
+                  <AdminRoute>
+                    <AttendanceEdit />
                   </AdminRoute>
                 }
               />

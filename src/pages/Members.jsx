@@ -12,7 +12,7 @@ const Members = () => {
     }, []);
 
     return (
-        <div className="container" style={{ padding: '6rem 0' }}>
+        <div className="container" style={{ padding: '6rem 2rem' }}>
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -70,44 +70,6 @@ const Members = () => {
 
                         <div style={{ flexBasis: '100%', display: 'none' }}></div> {/* Spacer for wrap if needed */}
 
-                        <div style={{ flex: 2 }}>
-                            {/* Part Tracks (Moved outside the link to ensure they work) */}
-                            {(song.sopranoAudio || song.altoAudio || song.tenorAudio || song.bassAudio) && (
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
-                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', width: '100%', marginBottom: '0.2rem' }}>Practice Tracks:</span>
-                                    {song.sopranoAudio && (
-                                        <a href={song.sopranoAudio} target="_blank" rel="noopener noreferrer" className="btn-outline" style={{ padding: '0.4rem 0.8rem', fontSize: '0.7rem' }}>Soprano</a>
-                                    )}
-                                    {song.altoAudio && (
-                                        <a href={song.altoAudio} target="_blank" rel="noopener noreferrer" className="btn-outline" style={{ padding: '0.4rem 0.8rem', fontSize: '0.7rem' }}>Alto</a>
-                                    )}
-                                    {song.tenorAudio && (
-                                        <a href={song.tenorAudio} target="_blank" rel="noopener noreferrer" className="btn-outline" style={{ padding: '0.4rem 0.8rem', fontSize: '0.7rem' }}>Tenor</a>
-                                    )}
-                                    {song.bassAudio && (
-                                        <a href={song.bassAudio} target="_blank" rel="noopener noreferrer" className="btn-outline" style={{ padding: '0.4rem 0.8rem', fontSize: '0.7rem' }}>Bass</a>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-
-                        <div style={{ display: 'flex', gap: '1rem', marginLeft: '2rem' }}>
-                            {song.pdf && (
-                                <a href={song.pdf} target="_blank" rel="noopener noreferrer" className="btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.2rem', fontSize: '0.8rem' }} title="View PDF">
-                                    <FileText size={16} />
-                                    PDF
-                                </a>
-                            )}
-                            {song.audio && (
-                                <a href={song.audio} target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.2rem', fontSize: '0.8rem' }} title="Main Audio">
-                                    <Music size={16} />
-                                    Full Mix
-                                </a>
-                            )}
-                            <button className="btn-outline" style={{ padding: '0.6rem 0.8rem' }} title="Download">
-                                <Download size={16} />
-                            </button>
-                        </div>
                     </motion.div>
                 ))}
             </div>

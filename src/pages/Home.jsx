@@ -23,7 +23,7 @@ const Home = () => {
                     borderBottom: '4px solid var(--secondary)'
                 }}></div>
 
-                <div className="container" style={{ padding: '4rem 0' }}>
+                <div className="container" style={{ padding: '4rem 2rem' }}>
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}

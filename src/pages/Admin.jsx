@@ -73,7 +73,7 @@ const Admin = () => {
     };
 
     return (
-        <div className="container" style={{ padding: '6rem 0' }}>
+        <div className="container" style={{ padding: '6rem 2rem' }}>
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -170,41 +170,50 @@ const Admin = () => {
 
                         <h2 style={{ marginBottom: '1.5rem', color: 'var(--secondary)' }}>Current Members</h2>
                         <div style={{ display: 'grid', gap: '1rem' }}>
-                            {members.map(member => (
-                                <div key={member.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', background: 'var(--white)', borderRadius: '4px', border: '1px solid var(--glass-border)' }}>
-                                    <div style={{ display: 'flex', gap: '2rem', flex: 1 }}>
-                                        <div style={{ minWidth: '150px' }}>
-                                            <strong style={{ color: 'var(--secondary)' }}>{member.name || 'No Name'}</strong>
+                            {members
+                                .sort((a, b) => {
+                                    const voiceOrder = { 'Soprano': 1, 'Alto': 2, 'Tenor': 3, 'Bass': 4, 'Other': 5 };
+                                    const orderA = voiceOrder[a.voicePart] || 6;
+                                    const orderB = voiceOrder[b.voicePart] || 6;
+
+                                    if (orderA !== orderB) return orderA - orderB;
+                                    return (a.name || '').localeCompare(b.name || '');
+                                })
+                                .map(member => (
+                                    <div key={member.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', background: 'var(--white)', borderRadius: '4px', border: '1px solid var(--glass-border)' }}>
+                                        <div style={{ display: 'flex', gap: '2rem', flex: 1 }}>
+                                            <div style={{ minWidth: '150px' }}>
+                                                <strong style={{ color: 'var(--secondary)' }}>{member.name || 'No Name'}</strong>
+                                            </div>
+                                            <div style={{ minWidth: '150px', color: 'var(--text-muted)' }}>{member.email}</div>
+                                            <div style={{
+                                                padding: '0.2rem 0.6rem',
+                                                borderRadius: '20px',
+                                                fontSize: '0.8rem',
+                                                background: 'var(--accent-light)',
+                                                color: 'var(--secondary)'
+                                            }}>
+                                                {member.voicePart || 'Unassigned'}
+                                            </div>
                                         </div>
-                                        <div style={{ minWidth: '150px', color: 'var(--text-muted)' }}>{member.email}</div>
-                                        <div style={{
-                                            padding: '0.2rem 0.6rem',
-                                            borderRadius: '20px',
-                                            fontSize: '0.8rem',
-                                            background: 'var(--accent-light)',
-                                            color: 'var(--secondary)'
-                                        }}>
-                                            {member.voicePart || 'Unassigned'}
+                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                            <button
+                                                onClick={() => setEditingMember(member)}
+                                                style={{ color: 'var(--secondary)', background: 'none', border: 'none', cursor: 'pointer' }}
+                                                title="Edit Member"
+                                            >
+                                                <Edit2 size={18} />
+                                            </button>
+                                            <button
+                                                onClick={() => removeMember(member.id)}
+                                                style={{ color: 'red', background: 'none', border: 'none', cursor: 'pointer' }}
+                                                title="Remove Member"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
                                         </div>
                                     </div>
-                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                        <button
-                                            onClick={() => setEditingMember(member)}
-                                            style={{ color: 'var(--secondary)', background: 'none', border: 'none', cursor: 'pointer' }}
-                                            title="Edit Member"
-                                        >
-                                            <Edit2 size={18} />
-                                        </button>
-                                        <button
-                                            onClick={() => removeMember(member.id)}
-                                            style={{ color: 'red', background: 'none', border: 'none', cursor: 'pointer' }}
-                                            title="Remove Member"
-                                        >
-                                            <Trash2 size={18} />
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
+                                ))}
                             {members.length === 0 && <p style={{ color: 'var(--text-muted)' }}>No members added yet.</p>}
                         </div>
                     </div>

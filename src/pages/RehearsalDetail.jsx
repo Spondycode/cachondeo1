@@ -63,19 +63,17 @@ const RehearsalDetail = () => {
                     }}>
                         <div style={{
                             position: 'absolute',
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
+                            inset: 0,
                             padding: '2rem',
-                            background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
+                            background: 'rgba(0, 31, 63, 0.9)', // Solid dark blue with high opacity
                             color: 'white',
                             display: 'flex',
                             justifyContent: 'space-between',
                             alignItems: 'flex-end'
                         }}>
                             <div>
-                                <h1 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>Next Rehearsal</h1>
-                                <div style={{ display: 'flex', gap: '1.5rem', fontSize: '1rem', opacity: 0.9 }}>
+                                <h1 style={{ fontSize: '2.5rem', marginBottom: '0.5rem', color: 'white' }}>Next Rehearsal</h1>
+                                <div style={{ display: 'flex', gap: '1.5rem', fontSize: '1rem', color: 'white', fontWeight: '500' }}>
                                     <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                                         <Calendar size={18} /> {rehearsal.date}
                                     </span>

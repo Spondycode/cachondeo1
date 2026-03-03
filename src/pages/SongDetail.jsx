@@ -18,7 +18,7 @@ const SongDetail = () => {
         }
     }, [id, navigate]);
 
-    if (!song) return <div className="container" style={{ padding: '6rem 0' }}>Loading...</div>;
+    if (!song) return <div className="container" style={{ padding: '2rem 2rem' }}>Loading...</div>;
 
     const practiceTracks = [
         { label: 'Soprano', url: song.sopranoAudio },
@@ -28,7 +28,7 @@ const SongDetail = () => {
     ].filter(track => track.url);
 
     return (
-        <div className="container" style={{ padding: '6rem 0' }}>
+        <div className="container" style={{ padding: '2rem 2rem' }}>
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
