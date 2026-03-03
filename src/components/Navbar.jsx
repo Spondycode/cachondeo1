@@ -38,8 +38,8 @@ const Navbar = () => {
                 <div style={{ display: 'flex', gap: '2rem', alignItems: 'center', color: 'var(--text-main)' }}>
                     {/* <Link to="/" style={{ fontSize: '0.9rem', fontWeight: '500' }}>Home</Link> */}
                     {user && (
-                        <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
-                            <Link to="/members" style={{ color: 'var(--text-main)', textDecoration: 'none', fontWeight: '500', fontSize: '0.9rem' }}>Members</Link>
+                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                            <Link to="/members" style={{ color: 'var(--text-main)', textDecoration: 'none', fontWeight: '500', fontSize: '0.9rem' }}>Songs</Link>
                             {user.isAdmin && (
                                 <Link to="/admin" style={{ color: 'var(--secondary)', textDecoration: 'none', fontWeight: '600', fontSize: '0.9rem' }}>Admin</Link>
                             )}
@@ -55,7 +55,7 @@ const Navbar = () => {
                                 >
                                     {user.name}
                                 </Link>
-                                <button onClick={handleLogout} className="btn-outline" style={{ padding: '0.5rem 1rem', fontSize: '0.8rem' }}>Logout</button>
+                                <button onClick={handleLogout} className="btn-outline" style={{ padding: '0.5rem 0.5rem', fontSize: '0.8rem' }}>Logout</button>
                             </div>
                         </div>
                     )}

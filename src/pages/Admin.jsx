@@ -97,7 +97,7 @@ const Admin = () => {
                 </div>
             )}
 
-            <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
+            <div className="admin-nav-buttons" style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
                 <button
                     onClick={() => setActiveTab('members')}
                     className={activeTab === 'members' ? 'btn-primary' : 'btn-outline'}

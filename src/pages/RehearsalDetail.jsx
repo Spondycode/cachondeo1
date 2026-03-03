@@ -54,7 +54,7 @@ const RehearsalDetail = () => {
                 <div className="glass-card" style={{ padding: 0, overflow: 'hidden', border: 'none' }}>
                     {/* Hero Image */}
                     <div style={{
-                        height: '300px',
+                        height: '150px',
                         width: '100%',
                         backgroundImage: `url(${rehearsal.imageUrl})`,
                         backgroundSize: 'cover',
@@ -64,7 +64,7 @@ const RehearsalDetail = () => {
                         <div style={{
                             position: 'absolute',
                             inset: 0,
-                            padding: '2rem',
+                            padding: '1rem',
                             background: 'rgba(0, 31, 63, 0.9)', // Solid dark blue with high opacity
                             color: 'white',
                             display: 'flex',

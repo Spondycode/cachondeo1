@@ -127,3 +127,14 @@ body,
 .content {
   flex: 1;
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .admin-nav-buttons {
+    flex-direction: column !important;
+  }
+
+  .admin-nav-buttons button {
+    width: 100% !important;
+  }
+}

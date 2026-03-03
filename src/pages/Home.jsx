@@ -41,16 +41,15 @@ const Home = () => {
                             <Link to="/repertoire" className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 Explore Repertoire <ArrowRight size={18} />
                             </Link>
-                            <button className="btn-outline">Watch Our Story</button>
                         </div>
                     </motion.div>
                 </div>
             </section>
 
             {/* Features Section */}
-            <section style={{ padding: '8rem 0', background: 'var(--primary)' }}>
+            <section style={{ padding: '1rem 0', background: 'var(--primary)' }}>
                 <div className="container">
-                    <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+                    <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
                         <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Our Vibrant Community</h2>
                         <div style={{ width: '60px', height: '3px', background: 'var(--accent)', margin: '0 auto' }}></div>
                     </div>
