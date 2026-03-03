@@ -18,9 +18,10 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
             if (firebaseUser) {
+                setLoading(true);
                 try {
-                    // Fetch extra user data from Firestore
-                    const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+                    // Fetch extra user data from Firestore (points to 'members' collection)
+                    const userDoc = await getDoc(doc(db, 'members', firebaseUser.uid));
                     const userData = userDoc.data();
 
                     const isAdmin = firebaseUser.email === 'spondycodedev@gmail.com';
@@ -74,7 +75,7 @@ export const AuthProvider = ({ children }) => {
     const updateUserProfile = async (updatedData) => {
         if (!user) return false;
         try {
-            const userRef = doc(db, 'users', user.uid);
+            const userRef = doc(db, 'members', user.uid);
             await setDoc(userRef, updatedData, { merge: true });
             setUser(prev => ({ ...prev, ...updatedData }));
             return true;

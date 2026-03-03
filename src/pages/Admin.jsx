@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Users, Music, Plus, Trash2, Save, FileText, Link as LinkIcon, X, Edit2, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { db } from '../firebase';
+import { db, auth } from '../firebase';
+import { initializeApp, getApp, getApps } from 'firebase/app';
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import {
     collection,
     addDoc,
@@ -11,8 +13,24 @@ import {
     updateDoc,
     onSnapshot,
     query,
-    orderBy
+    orderBy,
+    setDoc
 } from 'firebase/firestore';
+
+// Secondary Firebase app for creating users without logging out the admin
+const firebaseConfig = {
+    apiKey: "AIzaSyC1SFPcV5LBbXsAfudv2_HgDBpxms0c95s",
+    authDomain: "cachy-5edef.firebaseapp.com",
+    projectId: "cachy-5edef",
+    storageBucket: "cachy-5edef.firebasestorage.app",
+    messagingSenderId: "1067901621037",
+    appId: "1:1067901621037:web:f2b36355a44f69168839a4"
+};
+
+const secondaryApp = getApps().length > 1
+    ? getApp('secondary')
+    : initializeApp(firebaseConfig, 'secondary');
+const secondaryAuth = getAuth(secondaryApp);
 
 const Admin = () => {
     const [activeTab, setActiveTab] = useState('members');
@@ -60,17 +78,52 @@ const Admin = () => {
 
     const handleAddMember = async (e) => {
         e.preventDefault();
+
         if (members.find(m => m.email === newMember.email)) {
-            showMessage('Member already exists', 'error');
+            showMessage('Member already exists in Firestore list', 'error');
             return;
         }
+
         try {
-            await addDoc(collection(db, 'members'), newMember);
+            showMessage('Creating user account...', 'info');
+
+            // 1. Create user in Firebase Auth using secondary instance
+            // This prevents the admin from being logged out
+            let userCredential;
+            try {
+                userCredential = await createUserWithEmailAndPassword(
+                    secondaryAuth,
+                    newMember.email,
+                    newMember.password
+                );
+            } catch (authError) {
+                if (authError.code === 'auth/email-already-in-use') {
+                    showMessage('This email is already registered in Firebase Auth. Adding to list only...', 'info');
+                } else {
+                    throw authError;
+                }
+            }
+
+            // 2. Add member document to Firestore
+            // Use setDoc with the Auth UID if possible, or addDoc
+            const uid = userCredential ? userCredential.user.uid : null;
+            const memberData = {
+                ...newMember,
+                uid: uid,
+                createdAt: new Date().toISOString()
+            };
+
+            if (uid) {
+                await setDoc(doc(db, 'members', uid), memberData);
+            } else {
+                await addDoc(collection(db, 'members'), memberData);
+            }
+
             setNewMember({ name: '', email: '', phone: '', password: '', voicePart: 'Soprano' });
-            showMessage('Member added successfully');
+            showMessage('Member and account created successfully!');
         } catch (error) {
             console.error("Error adding member:", error);
-            showMessage(`Failed to add member: ${error.message || 'Unknown error'}`, 'error');
+            showMessage(`Failed to create member/account: ${error.message}`, 'error');
         }
     };
 

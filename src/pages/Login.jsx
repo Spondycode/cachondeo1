@@ -8,10 +8,17 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const { login } = useAuth();
+    const { login, user } = useAuth();
     const navigate = useNavigate();
 
     const [isLoading, setIsLoading] = useState(false);
+
+    // Robust redirection: Whenever the user state becomes present, go to /rehearsal
+    React.useEffect(() => {
+        if (user) {
+            navigate('/rehearsal');
+        }
+    }, [user, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -20,11 +27,11 @@ const Login = () => {
 
         try {
             const result = await login(email, password);
-            if (result.success) {
-                navigate('/members');
-            } else {
+            if (!result.success) {
                 setError(result.error || 'Invalid login credentials.');
             }
+            // Note: If success, the useEffect above will handle the navigation
+            // once the AuthContext updates the 'user' state.
         } catch (err) {
             setError("An unexpected error occurred. Please try again.");
         } finally {

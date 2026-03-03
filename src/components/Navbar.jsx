@@ -48,6 +48,13 @@ const Navbar = () => {
                     {user && (
                         <div className="nav-menu-items">
                             <Link
+                                to="/rehearsal"
+                                onClick={() => setIsMenuOpen(false)}
+                                style={{ color: 'var(--text-main)', textDecoration: 'none', fontWeight: '500', fontSize: '0.9rem' }}
+                            >
+                                Rehearsal
+                            </Link>
+                            <Link
                                 to="/members"
                                 onClick={() => setIsMenuOpen(false)}
                                 style={{ color: 'var(--text-main)', textDecoration: 'none', fontWeight: '500', fontSize: '0.9rem' }}
