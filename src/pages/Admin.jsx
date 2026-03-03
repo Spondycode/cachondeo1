@@ -10,7 +10,7 @@ const Admin = () => {
     const navigate = useNavigate();
 
     // Form states
-    const [newMember, setNewMember] = useState({ name: '', email: '', password: '', voicePart: 'Soprano' });
+    const [newMember, setNewMember] = useState({ name: '', email: '', phone: '', password: '', voicePart: 'Soprano' });
     const [newSong, setNewSong] = useState({ title: '', composer: '', pdf: '', audio: '', description: '' });
     const [editingMember, setEditingMember] = useState(null);
     const [message, setMessage] = useState({ text: '', type: '' });
@@ -36,7 +36,7 @@ const Admin = () => {
         const updatedMembers = [...members, { ...newMember, id: Date.now() }];
         setMembers(updatedMembers);
         localStorage.setItem('choir_members', JSON.stringify(updatedMembers));
-        setNewMember({ name: '', email: '', password: '', voicePart: 'Soprano' });
+        setNewMember({ name: '', email: '', phone: '', password: '', voicePart: 'Soprano' });
         showMessage('Member added successfully');
     };
 
@@ -126,7 +126,7 @@ const Admin = () => {
                 {activeTab === 'members' ? (
                     <div>
                         <h2 style={{ marginBottom: '1.5rem', color: 'var(--secondary)' }}>Add New Member</h2>
-                        <form onSubmit={handleAddMember} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '2rem' }}>
+                        <form onSubmit={handleAddMember} className="admin-form" style={{ gap: '1rem', marginBottom: '2rem' }}>
                             <input
                                 type="text"
                                 placeholder="Full Name"
@@ -156,6 +156,13 @@ const Admin = () => {
                                 style={{ padding: '0.8rem', borderRadius: '4px', border: '1px solid var(--glass-border)' }}
                             />
                             <input
+                                type="tel"
+                                placeholder="Phone Number"
+                                value={newMember.phone}
+                                onChange={e => setNewMember({ ...newMember, phone: e.target.value })}
+                                style={{ padding: '0.8rem', borderRadius: '4px', border: '1px solid var(--glass-border)' }}
+                            />
+                            <input
                                 type="text"
                                 placeholder="Temporary Password"
                                 value={newMember.password}
@@ -170,6 +177,26 @@ const Admin = () => {
 
                         <h2 style={{ marginBottom: '1.5rem', color: 'var(--secondary)' }}>Current Members</h2>
                         <div style={{ display: 'grid', gap: '1rem' }}>
+                            {members.length > 0 && (
+                                <div className="member-grid-layout member-list-header" style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: 'minmax(150px, 1fr) minmax(200px, 1.5fr) minmax(130px, 1fr) 100px 80px',
+                                    alignItems: 'center',
+                                    gap: '1rem',
+                                    padding: '0 1rem',
+                                    fontSize: '0.8rem',
+                                    color: 'var(--text-muted)',
+                                    fontWeight: '600',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '1px'
+                                }}>
+                                    <div>Name</div>
+                                    <div>Email</div>
+                                    <div>Phone</div>
+                                    <div style={{ textAlign: 'center' }}>Voice</div>
+                                    <div style={{ textAlign: 'right' }}>Actions</div>
+                                </div>
+                            )}
                             {members
                                 .sort((a, b) => {
                                     const voiceOrder = { 'Soprano': 1, 'Alto': 2, 'Tenor': 3, 'Bass': 4, 'Other': 5 };
@@ -180,37 +207,37 @@ const Admin = () => {
                                     return (a.name || '').localeCompare(b.name || '');
                                 })
                                 .map(member => (
-                                    <div key={member.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', background: 'var(--white)', borderRadius: '4px', border: '1px solid var(--glass-border)' }}>
-                                        <div style={{ display: 'flex', gap: '2rem', flex: 1 }}>
-                                            <div style={{ minWidth: '150px' }}>
-                                                <strong style={{ color: 'var(--secondary)' }}>{member.name || 'No Name'}</strong>
-                                            </div>
-                                            <div style={{ minWidth: '150px', color: 'var(--text-muted)' }}>{member.email}</div>
+                                    <div key={member.id} className="admin-list-card" style={{ padding: '1rem', background: 'var(--white)', borderRadius: '4px', border: '1px solid var(--glass-border)' }}>
+                                        <div className="member-grid-layout" style={{ display: 'grid', gridTemplateColumns: 'minmax(150px, 1fr) minmax(200px, 1.5fr) minmax(130px, 1fr) 100px 80px', alignItems: 'center', gap: '1rem', width: '100%' }}>
+                                            <div style={{ fontWeight: '600', color: 'var(--secondary)' }}>{member.name || 'No Name'}</div>
+                                            <div style={{ color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{member.email}</div>
+                                            <div style={{ color: 'var(--text-muted)' }}>{member.phone || 'No Phone'}</div>
                                             <div style={{
                                                 padding: '0.2rem 0.6rem',
                                                 borderRadius: '20px',
                                                 fontSize: '0.8rem',
                                                 background: 'var(--accent-light)',
-                                                color: 'var(--secondary)'
+                                                color: 'var(--secondary)',
+                                                textAlign: 'center'
                                             }}>
                                                 {member.voicePart || 'Unassigned'}
                                             </div>
-                                        </div>
-                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                            <button
-                                                onClick={() => setEditingMember(member)}
-                                                style={{ color: 'var(--secondary)', background: 'none', border: 'none', cursor: 'pointer' }}
-                                                title="Edit Member"
-                                            >
-                                                <Edit2 size={18} />
-                                            </button>
-                                            <button
-                                                onClick={() => removeMember(member.id)}
-                                                style={{ color: 'red', background: 'none', border: 'none', cursor: 'pointer' }}
-                                                title="Remove Member"
-                                            >
-                                                <Trash2 size={18} />
-                                            </button>
+                                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                                                <button
+                                                    onClick={() => setEditingMember(member)}
+                                                    style={{ color: 'var(--secondary)', background: 'none', border: 'none', cursor: 'pointer' }}
+                                                    title="Edit Member"
+                                                >
+                                                    <Edit2 size={18} />
+                                                </button>
+                                                <button
+                                                    onClick={() => removeMember(member.id)}
+                                                    style={{ color: 'red', background: 'none', border: 'none', cursor: 'pointer' }}
+                                                    title="Remove Member"
+                                                >
+                                                    <Trash2 size={18} />
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -269,7 +296,7 @@ const Admin = () => {
                         <h2 style={{ marginBottom: '1.5rem', color: 'var(--secondary)' }}>Current Repertoire</h2>
                         <div style={{ display: 'grid', gap: '1rem' }}>
                             {songs.map(song => (
-                                <div key={song.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', background: 'var(--white)', borderRadius: '4px', border: '1px solid var(--glass-border)' }}>
+                                <div key={song.id} className="admin-list-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', background: 'var(--white)', borderRadius: '4px', border: '1px solid var(--glass-border)' }}>
                                     <div>
                                         <strong style={{ color: 'var(--secondary)' }}>{song.title}</strong>
                                         <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{song.composer}</div>
@@ -338,6 +365,15 @@ const Admin = () => {
                                     value={editingMember.email}
                                     onChange={e => setEditingMember({ ...editingMember, email: e.target.value })}
                                     required
+                                    style={{ width: '100%', padding: '0.8rem', borderRadius: '4px', border: '1px solid var(--glass-border)' }}
+                                />
+                            </div>
+                            <div>
+                                <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.3rem', display: 'block' }}>Phone Number</label>
+                                <input
+                                    type="tel"
+                                    value={editingMember.phone || ''}
+                                    onChange={e => setEditingMember({ ...editingMember, phone: e.target.value })}
                                     style={{ width: '100%', padding: '0.8rem', borderRadius: '4px', border: '1px solid var(--glass-border)' }}
                                 />
                             </div>
