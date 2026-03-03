@@ -10,41 +10,34 @@ const Home = () => {
         <div className="home-page">
             {/* Hero Section */}
             <section className="hero" style={{
-                position: 'relative',
-                height: '80vh',
-                display: 'flex',
-                alignItems: 'center',
-                backgroundColor: '#f0f7ff',
+                backgroundColor: '#ffffff',
                 overflow: 'hidden'
             }}>
                 {/* Costa Brava Hero Image */}
                 <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
                     width: '100%',
-                    height: '100%',
-                    opacity: 1,
-                    background: 'linear-gradient(rgba(240, 247, 255, 0.2), rgba(240, 247, 255, 0.2)), url("/costa_brava_hero.png")',
+                    height: '50vh',
+                    backgroundImage: 'url("/costa_brava_hero.png")',
                     backgroundSize: 'cover',
-                    backgroundPosition: 'center'
+                    backgroundPosition: 'center',
+                    borderBottom: '4px solid var(--secondary)'
                 }}></div>
 
-                <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+                <div className="container" style={{ padding: '4rem 0' }}>
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8 }}
-                        style={{ maxWidth: '800px' }}
+                        style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}
                     >
-                        <h1 style={{ fontSize: '4.5rem', marginBottom: '1.5rem', lineHeight: '1.1', textShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
-                            Singing the <br />
-                            <span style={{ color: 'var(--secondary)' }}>Joy of Summer</span>
+                        <h1 style={{ fontSize: '3.5rem', marginBottom: '1.5rem', lineHeight: '1.1' }}>
+
+                            <span style={{ color: 'var(--secondary)' }}>Singing For Fun</span>
                         </h1>
-                        <p style={{ fontSize: '1.2rem', color: 'var(--text-main)', marginBottom: '2.5rem', maxWidth: '600px', fontWeight: '500' }}>
+                        <p style={{ fontSize: '1.25rem', color: 'var(--text-main)', marginBottom: '2.5rem', fontWeight: '500', lineHeight: '1.6' }}>
                             Welcome to Cachondeo Choir. We are a high-energy community on the Costa Brava, bringing popular hits to life with sun, sea, and song.
                         </p>
-                        <div style={{ display: 'flex', gap: '1.5rem' }}>
+                        <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center' }}>
                             <Link to="/repertoire" className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 Explore Repertoire <ArrowRight size={18} />
                             </Link>

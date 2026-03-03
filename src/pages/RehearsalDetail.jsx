@@ -129,35 +129,17 @@ const RehearsalDetail = () => {
                             </div>
 
                             {/* Sidebar / Location */}
-                            <div style={{ background: '#f8fbff', padding: '2rem', borderRadius: '16px', border: '1px solid rgba(0,0,0,0.05)' }}>
+                            <div style={{ background: '#f8fbff', padding: '2rem', borderRadius: '16px', border: '1px solid rgba(0,0,0,0.05)', alignSelf: 'start' }}>
                                 <h3 style={{ color: 'var(--secondary)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                     <MapPin size={20} color="var(--accent)" /> Venue Details
                                 </h3>
 
                                 <p style={{ fontWeight: '600', color: 'var(--text-main)', marginBottom: '0.2rem' }}>{rehearsal.location}</p>
-                                <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '1.5rem', lineHeight: '1.5' }}>
+                                <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '0rem', lineHeight: '1.5' }}>
                                     {rehearsal.address}
                                 </p>
-
-                                {/* Map Placeholder/Visual */}
-                                <div style={{
-                                    height: '150px',
-                                    background: '#e0e9f5',
-                                    borderRadius: '8px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    marginBottom: '1.5rem',
-                                    border: '1px dashed #cbd5e0'
-                                }}>
-                                    <MapPin size={32} color="var(--text-muted)" opacity={0.5} />
-                                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginLeft: '0.5rem' }}>Map view placeholder</span>
-                                </div>
-
-                                <button className="btn-outline" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                                    Open in Google Maps <ExternalLink size={16} />
-                                </button>
                             </div>
+
                         </div>
                     </div>
                 </div>
