@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Music, Plus, Trash2, Save, FileText, Link as LinkIcon, X, Edit2 } from 'lucide-react';
+import { Users, Music, Plus, Trash2, Save, FileText, Link as LinkIcon, X, Edit2, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const Admin = () => {
@@ -112,7 +112,15 @@ const Admin = () => {
                 >
                     <Music size={20} /> Manage Repertoire
                 </button>
+                <button
+                    onClick={() => navigate('/admin/attendance')}
+                    className="btn-outline"
+                    style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                >
+                    <Calendar size={20} /> Register Attendance
+                </button>
             </div>
+
 
             <div className="glass-card" style={{ padding: '2rem' }}>
                 {activeTab === 'members' ? (
