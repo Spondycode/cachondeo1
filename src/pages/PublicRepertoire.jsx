@@ -2,13 +2,25 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Music, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { db } from '../firebase';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 
 const PublicRepertoire = () => {
     const [songs, setSongs] = useState([]);
 
     useEffect(() => {
-        const storedSongs = JSON.parse(localStorage.getItem('choir_songs') || '[]');
-        setSongs(storedSongs);
+        const q = query(collection(db, 'songs'), orderBy('title'));
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const songsData = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setSongs(songsData);
+        }, (error) => {
+            console.error("Error fetching songs:", error);
+        });
+
+        return () => unsubscribe();
     }, []);
 
     return (

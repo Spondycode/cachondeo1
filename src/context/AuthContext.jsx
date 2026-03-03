@@ -1,4 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { auth, db } from '../firebase';
+import {
+    onAuthStateChanged,
+    signInWithEmailAndPassword,
+    signOut
+} from 'firebase/auth';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 
 const AuthContext = createContext();
 
@@ -8,81 +15,73 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    // Initialize mock data in localStorage
     useEffect(() => {
-        const savedUser = localStorage.getItem('choir_user');
-        if (savedUser) {
-            setUser(JSON.parse(savedUser));
-        }
+        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+            if (firebaseUser) {
+                try {
+                    // Fetch extra user data from Firestore
+                    const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+                    const userData = userDoc.data();
 
-        // Initialize members if not exists
-        if (!localStorage.getItem('choir_members')) {
-            localStorage.setItem('choir_members', JSON.stringify([]));
-        }
+                    const isAdmin = firebaseUser.email === 'spondycodedev@gmail.com';
 
-        // Initialize songs if not exists
-        if (!localStorage.getItem('choir_songs')) {
-            const initialSongs = [
-                { id: 1, title: "Dancing Queen", composer: "ABBA", pdf: "#", audio: "#" },
-                { id: 2, title: "Bohemian Rhapsody", composer: "Queen", pdf: "#", audio: "#" },
-                { id: 3, title: "Imagine", composer: "John Lennon", pdf: "#", audio: "#" },
-                { id: 4, title: "Viva La Vida", composer: "Coldplay", pdf: "#", audio: "#" }
-            ];
-            localStorage.setItem('choir_songs', JSON.stringify(initialSongs));
-        }
+                    setUser({
+                        uid: firebaseUser.uid,
+                        email: firebaseUser.email,
+                        name: userData?.name || (isAdmin ? 'Admin' : 'Choir Member'),
+                        voicePart: userData?.voicePart || (isAdmin ? 'N/A' : 'Unassigned'),
+                        isAdmin: isAdmin || userData?.isAdmin || false
+                    });
+                } catch (error) {
+                    console.error("Error fetching user data:", error);
+                    setUser({
+                        uid: firebaseUser.uid,
+                        email: firebaseUser.email,
+                        isAdmin: firebaseUser.email === 'spondycodedev@gmail.com'
+                    });
+                }
+            } else {
+                setUser(null);
+            }
+            setLoading(false);
+        });
 
-        setLoading(false);
+        return unsubscribe;
     }, []);
 
-    const login = (email, password) => {
-        if (email && password) {
-            const isAdmin = email === 'spondicious@protonmail.com';
-
-            // Check if member exists in storage
-            const storedMembers = JSON.parse(localStorage.getItem('choir_members') || '[]');
-            const member = storedMembers.find(m => m.email === email && m.password === password);
-
-            if (!isAdmin && !member) {
-                // If it's not admin and not a recognized member, we can still allow login for demo
-                // but let's try to find them by email at least
-                const existingByEmail = storedMembers.find(m => m.email === email);
-                if (existingByEmail && existingByEmail.password !== password) {
-                    return false; // Wrong password if they exist
-                }
-            }
-
-            const mockUser = {
-                email,
-                name: isAdmin ? 'Admin' : (member ? member.name : 'Choir Member'),
-                voicePart: member ? member.voicePart : (isAdmin ? 'N/A' : 'Unassigned'),
-                isAdmin: isAdmin
-            };
-            setUser(mockUser);
-            localStorage.setItem('choir_user', JSON.stringify(mockUser));
-            return true;
+    const login = async (email, password) => {
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            return { success: true };
+        } catch (error) {
+            console.error("Login failed:", error.message);
+            let message = "Invalid email or password.";
+            if (error.code === 'auth/user-not-found') message = "No account found with this email.";
+            if (error.code === 'auth/wrong-password') message = "Incorrect password.";
+            if (error.code === 'auth/invalid-credential') message = "Invalid login credentials.";
+            return { success: false, error: message };
         }
-        return false;
     };
 
-    const logout = () => {
-        setUser(null);
-        localStorage.removeItem('choir_user');
+    const logout = async () => {
+        try {
+            await signOut(auth);
+        } catch (error) {
+            console.error("Logout failed:", error.message);
+        }
     };
 
-    const updateUserProfile = (updatedData) => {
-        // Update user state
-        const updatedUser = { ...user, ...updatedData };
-        setUser(updatedUser);
-        localStorage.setItem('choir_user', JSON.stringify(updatedUser));
-
-        // Also update in choir_members list for persistence across logins
-        const storedMembers = JSON.parse(localStorage.getItem('choir_members') || '[]');
-        const updatedMembers = storedMembers.map(m =>
-            m.email === user.email ? { ...m, ...updatedData } : m
-        );
-        localStorage.setItem('choir_members', JSON.stringify(updatedMembers));
-
-        return true;
+    const updateUserProfile = async (updatedData) => {
+        if (!user) return false;
+        try {
+            const userRef = doc(db, 'users', user.uid);
+            await setDoc(userRef, updatedData, { merge: true });
+            setUser(prev => ({ ...prev, ...updatedData }));
+            return true;
+        } catch (error) {
+            console.error("Profile update failed:", error.message);
+            return false;
+        }
     };
 
     const value = {
@@ -95,7 +94,7 @@ export const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider value={value}>
-            {!loading && children}
+            {children}
         </AuthContext.Provider>
     );
 };

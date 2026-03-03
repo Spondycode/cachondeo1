@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Check, X, Save, ArrowLeft, Users, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { db } from '../firebase';
+import { doc, onSnapshot, updateDoc, collection, query, orderBy } from 'firebase/firestore';
 
 const AttendanceEdit = () => {
     const { date } = useParams();
@@ -12,12 +14,26 @@ const AttendanceEdit = () => {
 
     useEffect(() => {
         // Load members
-        const storedMembers = JSON.parse(localStorage.getItem('choir_members') || '[]');
-        setMembers(storedMembers.sort((a, b) => (a.name || '').localeCompare(b.name || '')));
+        const membersQuery = query(collection(db, 'members'), orderBy('name'));
+        const unsubscribeMembers = onSnapshot(membersQuery, (snapshot) => {
+            const membersData = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setMembers(membersData);
+        });
 
-        // Load attendance for this specifically date
-        const allAttendance = JSON.parse(localStorage.getItem('choir_attendance') || '{}');
-        setAttendance(allAttendance[date] || {});
+        // Load attendance for this specifically date (doc ID is the date string)
+        const unsubscribeRehearsal = onSnapshot(doc(db, 'rehearsals', date), (snapshot) => {
+            if (snapshot.exists()) {
+                setAttendance(snapshot.data().attendance || {});
+            }
+        });
+
+        return () => {
+            unsubscribeMembers();
+            unsubscribeRehearsal();
+        };
     }, [date]);
 
     const showMessage = (text, type = 'success') => {
@@ -32,14 +48,19 @@ const AttendanceEdit = () => {
         }));
     };
 
-    const handleSave = () => {
-        const allAttendance = JSON.parse(localStorage.getItem('choir_attendance') || '{}');
-        allAttendance[date] = attendance;
-        localStorage.setItem('choir_attendance', JSON.stringify(allAttendance));
-        showMessage('Attendance saved successfully');
+    const handleSave = async () => {
+        try {
+            await updateDoc(doc(db, 'rehearsals', date), {
+                attendance: attendance
+            });
+            showMessage('Attendance saved successfully');
 
-        // Return to log after short delay
-        setTimeout(() => navigate('/admin/attendance'), 1000);
+            // Return to log after short delay
+            setTimeout(() => navigate('/admin/attendance'), 1000);
+        } catch (error) {
+            console.error("Error saving attendance:", error);
+            showMessage(`Failed to save attendance: ${error.message}`, 'error');
+        }
     };
 
     const formatDate = (dateStr) => {

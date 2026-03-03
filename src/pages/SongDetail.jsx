@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Music, FileText, ArrowLeft, Download, Info, Headphones } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { db } from '../firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
 const SongDetail = () => {
     const { id } = useParams();
@@ -9,13 +11,20 @@ const SongDetail = () => {
     const [song, setSong] = useState(null);
 
     useEffect(() => {
-        const songs = JSON.parse(localStorage.getItem('choir_songs') || '[]');
-        const foundSong = songs.find(s => s.id === parseInt(id));
-        if (foundSong) {
-            setSong(foundSong);
-        } else {
-            navigate('/members');
-        }
+        const fetchSong = async () => {
+            try {
+                const songDoc = await getDoc(doc(db, 'songs', id));
+                if (songDoc.exists()) {
+                    setSong({ id: songDoc.id, ...songDoc.data() });
+                } else {
+                    navigate('/members');
+                }
+            } catch (error) {
+                console.error("Error fetching song:", error);
+                navigate('/members');
+            }
+        };
+        fetchSong();
     }, [id, navigate]);
 
     if (!song) return <div className="container" style={{ padding: '2rem 2rem' }}>Loading...</div>;

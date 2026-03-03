@@ -5,7 +5,13 @@ import { useAuth } from '../context/AuthContext';
 const AdminRoute = ({ children }) => {
     const { user, loading } = useAuth();
 
-    if (loading) return null;
+    if (loading) {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '4rem' }}>
+                <p style={{ color: 'var(--text-muted)' }}>Loading authentication...</p>
+            </div>
+        );
+    }
 
     if (!user || !user.isAdmin) {
         return <Navigate to="/" />;

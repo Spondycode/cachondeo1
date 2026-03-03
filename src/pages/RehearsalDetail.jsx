@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { Calendar, MapPin, Clock, Info, ArrowLeft, ExternalLink, Edit2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { db } from '../firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 const defaultRehearsal = {
     date: "Thursday, March 5, 2026",
@@ -15,23 +17,32 @@ const defaultRehearsal = {
 };
 
 const RehearsalDetail = () => {
-    const { user } = useAuth();
+    const { user, isAdmin } = useAuth();
     const navigate = useNavigate();
     const [rehearsal, setRehearsal] = useState(null);
 
     useEffect(() => {
-        const stored = localStorage.getItem('choir_rehearsal');
-        if (stored) {
-            setRehearsal(JSON.parse(stored));
-        } else {
-            setRehearsal(defaultRehearsal);
-            localStorage.setItem('choir_rehearsal', JSON.stringify(defaultRehearsal));
-        }
+        const fetchRehearsal = async () => {
+            try {
+                const docRef = doc(db, 'settings', 'next_rehearsal');
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    setRehearsal(docSnap.data());
+                } else {
+                    // Initialize with default if not found
+                    await setDoc(docRef, defaultRehearsal);
+                    setRehearsal(defaultRehearsal);
+                }
+            } catch (error) {
+                console.error("Error fetching rehearsal:", error);
+                setRehearsal(defaultRehearsal);
+            }
+        };
+        fetchRehearsal();
     }, []);
 
     if (!rehearsal) return <div className="container" style={{ padding: '6rem 0' }}>Loading...</div>;
-
-    const isAdmin = user?.email === 'spondicious@protonmail.com';
 
     return (
         <div className="container" style={{ padding: '6rem 0' }}>

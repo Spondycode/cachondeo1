@@ -2,6 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Users, Music, Plus, Trash2, Save, FileText, Link as LinkIcon, X, Edit2, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { db } from '../firebase';
+import {
+    collection,
+    addDoc,
+    deleteDoc,
+    doc,
+    updateDoc,
+    onSnapshot,
+    query,
+    orderBy
+} from 'firebase/firestore';
 
 const Admin = () => {
     const [activeTab, setActiveTab] = useState('members');
@@ -16,10 +27,30 @@ const Admin = () => {
     const [message, setMessage] = useState({ text: '', type: '' });
 
     useEffect(() => {
-        const storedMembers = JSON.parse(localStorage.getItem('choir_members') || '[]');
-        const storedSongs = JSON.parse(localStorage.getItem('choir_songs') || '[]');
-        setMembers(storedMembers);
-        setSongs(storedSongs);
+        // Real-time listener for members
+        const membersQuery = query(collection(db, 'members'), orderBy('name'));
+        const unsubscribeMembers = onSnapshot(membersQuery, (snapshot) => {
+            const membersData = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.id && doc.data()
+            }));
+            setMembers(membersData);
+        });
+
+        // Real-time listener for songs
+        const songsQuery = query(collection(db, 'songs'), orderBy('title'));
+        const unsubscribeSongs = onSnapshot(songsQuery, (snapshot) => {
+            const songsData = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setSongs(songsData);
+        });
+
+        return () => {
+            unsubscribeMembers();
+            unsubscribeSongs();
+        };
     }, []);
 
     const showMessage = (text, type = 'success') => {
@@ -27,49 +58,65 @@ const Admin = () => {
         setTimeout(() => setMessage({ text: '', type: '' }), 3000);
     };
 
-    const handleAddMember = (e) => {
+    const handleAddMember = async (e) => {
         e.preventDefault();
         if (members.find(m => m.email === newMember.email)) {
             showMessage('Member already exists', 'error');
             return;
         }
-        const updatedMembers = [...members, { ...newMember, id: Date.now() }];
-        setMembers(updatedMembers);
-        localStorage.setItem('choir_members', JSON.stringify(updatedMembers));
-        setNewMember({ name: '', email: '', phone: '', password: '', voicePart: 'Soprano' });
-        showMessage('Member added successfully');
+        try {
+            await addDoc(collection(db, 'members'), newMember);
+            setNewMember({ name: '', email: '', phone: '', password: '', voicePart: 'Soprano' });
+            showMessage('Member added successfully');
+        } catch (error) {
+            console.error("Error adding member:", error);
+            showMessage(`Failed to add member: ${error.message || 'Unknown error'}`, 'error');
+        }
     };
 
-    const handleAddSong = (e) => {
+    const handleAddSong = async (e) => {
         e.preventDefault();
-        const updatedSongs = [...songs, { ...newSong, id: Date.now() }];
-        setSongs(updatedSongs);
-        localStorage.setItem('choir_songs', JSON.stringify(updatedSongs));
-        setNewSong({ title: '', composer: '', pdf: '', audio: '', description: '' });
-        showMessage('Song added successfully');
+        try {
+            await addDoc(collection(db, 'songs'), newSong);
+            setNewSong({ title: '', composer: '', pdf: '', audio: '', description: '' });
+            showMessage('Song added successfully');
+        } catch (error) {
+            console.error("Error adding song:", error);
+            showMessage(`Failed to add song: ${error.message || 'Unknown error'}`, 'error');
+        }
     };
 
-    const removeMember = (id) => {
-        const updatedMembers = members.filter(m => m.id !== id);
-        setMembers(updatedMembers);
-        localStorage.setItem('choir_members', JSON.stringify(updatedMembers));
-        showMessage('Member removed');
+    const removeMember = async (id) => {
+        try {
+            await deleteDoc(doc(db, 'members', id));
+            showMessage('Member removed');
+        } catch (error) {
+            console.error("Error removing member:", error);
+            showMessage('Failed to remove member', 'error');
+        }
     };
 
-    const removeSong = (id) => {
-        const updatedSongs = songs.filter(s => s.id !== id);
-        setSongs(updatedSongs);
-        localStorage.setItem('choir_songs', JSON.stringify(updatedSongs));
-        showMessage('Song removed');
+    const removeSong = async (id) => {
+        try {
+            await deleteDoc(doc(db, 'songs', id));
+            showMessage('Song removed');
+        } catch (error) {
+            console.error("Error removing song:", error);
+            showMessage('Failed to remove song', 'error');
+        }
     };
 
-    const handleSaveEdit = (e) => {
+    const handleSaveEdit = async (e) => {
         e.preventDefault();
-        const updatedMembers = members.map(m => m.id === editingMember.id ? editingMember : m);
-        setMembers(updatedMembers);
-        localStorage.setItem('choir_members', JSON.stringify(updatedMembers));
-        setEditingMember(null);
-        showMessage('Member updated successfully');
+        try {
+            const { id, ...data } = editingMember;
+            await updateDoc(doc(db, 'members', id), data);
+            setEditingMember(null);
+            showMessage('Member updated successfully');
+        } catch (error) {
+            console.error("Error updating member:", error);
+            showMessage('Failed to update member', 'error');
+        }
     };
 
     return (

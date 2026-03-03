@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Save, X, Calendar, Clock, MapPin, Info, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { db } from '../firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 const defaultRehearsal = {
     date: "Thursday, March 5, 2026",
@@ -19,18 +21,32 @@ const EditRehearsal = () => {
     const [bringInput, setBringInput] = useState('');
 
     useEffect(() => {
-        const stored = localStorage.getItem('choir_rehearsal');
-        if (stored) {
-            setRehearsal(JSON.parse(stored));
-        } else {
-            setRehearsal(defaultRehearsal);
-        }
+        const fetchRehearsal = async () => {
+            try {
+                const docRef = doc(db, 'settings', 'next_rehearsal');
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    setRehearsal(docSnap.data());
+                } else {
+                    setRehearsal(defaultRehearsal);
+                }
+            } catch (error) {
+                console.error("Error fetching rehearsal:", error);
+                setRehearsal(defaultRehearsal);
+            }
+        };
+        fetchRehearsal();
     }, []);
 
-    const handleSave = (e) => {
+    const handleSave = async (e) => {
         e.preventDefault();
-        localStorage.setItem('choir_rehearsal', JSON.stringify(rehearsal));
-        navigate('/rehearsal');
+        try {
+            await setDoc(doc(db, 'settings', 'next_rehearsal'), rehearsal);
+            navigate('/rehearsal');
+        } catch (error) {
+            console.error("Error saving rehearsal:", error);
+            alert('Failed to save changes');
+        }
     };
 
     const handleAddBring = () => {

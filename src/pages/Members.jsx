@@ -1,14 +1,24 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { FileText, Music, Download, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { db } from '../firebase';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 
 const Members = () => {
-    const [songs, setSongs] = React.useState([]);
+    const [songs, setSongs] = useState([]);
 
-    React.useEffect(() => {
-        const storedSongs = JSON.parse(localStorage.getItem('choir_songs') || '[]');
-        setSongs(storedSongs);
+    useEffect(() => {
+        const songsQuery = query(collection(db, 'songs'), orderBy('title'));
+        const unsubscribe = onSnapshot(songsQuery, (snapshot) => {
+            const songsData = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setSongs(songsData);
+        });
+
+        return () => unsubscribe();
     }, []);
 
     return (

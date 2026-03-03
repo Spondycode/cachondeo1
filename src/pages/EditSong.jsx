@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Save, X, Music, FileText, Info } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { db } from '../firebase';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
 const EditSong = () => {
     const { id } = useParams();
@@ -9,32 +11,42 @@ const EditSong = () => {
     const [song, setSong] = useState(null);
 
     useEffect(() => {
-        const songs = JSON.parse(localStorage.getItem('choir_songs') || '[]');
-        const foundSong = songs.find(s => s.id === parseInt(id));
-        if (foundSong) {
-            setSong({
-                title: '',
-                composer: '',
-                pdf: '',
-                audio: '',
-                sopranoAudio: '',
-                altoAudio: '',
-                tenorAudio: '',
-                bassAudio: '',
-                description: '',
-                ...foundSong
-            });
-        } else {
-            navigate('/admin');
-        }
+        const fetchSong = async () => {
+            try {
+                const songDoc = await getDoc(doc(db, 'songs', id));
+                if (songDoc.exists()) {
+                    setSong({
+                        title: '',
+                        composer: '',
+                        pdf: '',
+                        audio: '',
+                        sopranoAudio: '',
+                        altoAudio: '',
+                        tenorAudio: '',
+                        bassAudio: '',
+                        description: '',
+                        ...songDoc.data()
+                    });
+                } else {
+                    navigate('/admin');
+                }
+            } catch (error) {
+                console.error("Error fetching song:", error);
+                navigate('/admin');
+            }
+        };
+        fetchSong();
     }, [id, navigate]);
 
-    const handleSave = (e) => {
+    const handleSave = async (e) => {
         e.preventDefault();
-        const songs = JSON.parse(localStorage.getItem('choir_songs') || '[]');
-        const updatedSongs = songs.map(s => s.id === parseInt(id) ? { ...song } : s);
-        localStorage.setItem('choir_songs', JSON.stringify(updatedSongs));
-        navigate('/admin');
+        try {
+            await updateDoc(doc(db, 'songs', id), song);
+            navigate('/admin');
+        } catch (error) {
+            console.error("Error updating song:", error);
+            alert('Failed to update song');
+        }
     };
 
     if (!song) return <div className="container" style={{ padding: '6rem 0' }}>Loading...</div>;

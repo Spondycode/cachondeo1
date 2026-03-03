@@ -11,14 +11,24 @@ const Login = () => {
     const { login } = useAuth();
     const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+        setIsLoading(true);
 
-        if (login(email, password)) {
-            navigate('/members');
-        } else {
-            setError('Invalid login credentials. Any email/password combination works in this mock version.');
+        try {
+            const result = await login(email, password);
+            if (result.success) {
+                navigate('/members');
+            } else {
+                setError(result.error || 'Invalid login credentials.');
+            }
+        } catch (err) {
+            setError("An unexpected error occurred. Please try again.");
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -105,9 +115,28 @@ const Login = () => {
                         </div>
                     </div>
 
-                    <button type="submit" className="btn-primary" style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}>
-                        <LogIn size={20} />
-                        Sign In
+                    <button
+                        type="submit"
+                        className="btn-primary"
+                        disabled={isLoading}
+                        style={{
+                            width: '100%',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            opacity: isLoading ? 0.7 : 1,
+                            cursor: isLoading ? 'not-allowed' : 'pointer'
+                        }}
+                    >
+                        {isLoading ? (
+                            <span>Signing In...</span>
+                        ) : (
+                            <>
+                                <LogIn size={20} />
+                                Sign In
+                            </>
+                        )}
                     </button>
                 </form>
             </motion.div>

@@ -2,29 +2,50 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check, X, Save, Plus, ArrowLeft, Calendar, Users, Trash2, ChevronRight, Edit2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { db } from '../firebase';
+import {
+    collection,
+    onSnapshot,
+    query,
+    orderBy,
+    doc,
+    setDoc,
+    deleteDoc
+} from 'firebase/firestore';
 
 const Attendance = () => {
     const navigate = useNavigate();
     const [members, setMembers] = useState([]);
-    const [rehearsalDates, setRehearsalDates] = useState([]); // Array of ISO strings YYYY-MM-DD
-    const [attendance, setAttendance] = useState({}); // { [dateString]: { [memberId]: boolean } }
+    const [rehearsals, setRehearsals] = useState([]); // Array of rehearsal docs
     const [message, setMessage] = useState({ text: '', type: '' });
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [newDate, setNewDate] = useState(new Date().toISOString().split('T')[0]);
 
     useEffect(() => {
         // Load members
-        const storedMembers = JSON.parse(localStorage.getItem('choir_members') || '[]');
-        setMembers(storedMembers);
+        const membersQuery = query(collection(db, 'members'), orderBy('name'));
+        const unsubscribeMembers = onSnapshot(membersQuery, (snapshot) => {
+            const membersData = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setMembers(membersData);
+        });
 
-        // Load attendance data
-        const storedAttendance = JSON.parse(localStorage.getItem('choir_attendance') || '{}');
-        const dates = Object.keys(storedAttendance).sort((a, b) => new Date(b) - new Date(a));
+        // Load rehearsal data
+        const rehearsalsQuery = query(collection(db, 'rehearsals'), orderBy('date', 'desc'));
+        const unsubscribeRehearsals = onSnapshot(rehearsalsQuery, (snapshot) => {
+            const rehearsalsData = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setRehearsals(rehearsalsData);
+        });
 
-        if (dates.length > 0) {
-            setRehearsalDates(dates);
-            setAttendance(storedAttendance);
-        }
+        return () => {
+            unsubscribeMembers();
+            unsubscribeRehearsals();
+        };
     }, []);
 
     const showMessage = (text, type = 'success') => {
@@ -32,38 +53,38 @@ const Attendance = () => {
         setTimeout(() => setMessage({ text: '', type: '' }), 3000);
     };
 
-    const handleAddWeek = () => {
+    const handleAddWeek = async () => {
         if (!newDate) return;
 
-        if (rehearsalDates.includes(newDate)) {
+        if (rehearsals.find(r => r.date === newDate)) {
             showMessage('This date already exists', 'error');
             return;
         }
 
-        const updatedDates = [newDate, ...rehearsalDates].sort((a, b) => new Date(b) - new Date(a));
-        const updatedAttendance = { ...attendance, [newDate]: {} };
-
-        setRehearsalDates(updatedDates);
-        setAttendance(updatedAttendance);
-        localStorage.setItem('choir_attendance', JSON.stringify(updatedAttendance));
-
-        setIsAddModalOpen(false);
-        showMessage('New rehearsal date added');
-
-        // Navigate to edit for the new date
-        navigate(`/admin/attendance/${newDate}`);
+        try {
+            // Use date as doc ID to ensure uniqueness per date
+            await setDoc(doc(db, 'rehearsals', newDate), {
+                date: newDate,
+                attendance: {}
+            });
+            setIsAddModalOpen(false);
+            showMessage('New rehearsal date added');
+            navigate(`/admin/attendance/${newDate}`);
+        } catch (error) {
+            console.error("Error adding rehearsal:", error);
+            showMessage(`Failed to add rehearsal: ${error.message}`, 'error');
+        }
     };
 
-    const removeWeek = (date) => {
+    const removeWeek = async (date) => {
         if (window.confirm(`Are you sure you want to remove all attendance data for ${formatDate(date)}?`)) {
-            const updatedDates = rehearsalDates.filter(d => d !== date);
-            const updatedAttendance = { ...attendance };
-            delete updatedAttendance[date];
-
-            setRehearsalDates(updatedDates);
-            setAttendance(updatedAttendance);
-            localStorage.setItem('choir_attendance', JSON.stringify(updatedAttendance));
-            showMessage('Week deleted');
+            try {
+                await deleteDoc(doc(db, 'rehearsals', date));
+                showMessage('Week deleted');
+            } catch (error) {
+                console.error("Error removing rehearsal:", error);
+                showMessage('Failed to remove week', 'error');
+            }
         }
     };
 
@@ -72,8 +93,8 @@ const Attendance = () => {
         return new Date(dateStr).toLocaleDateString(undefined, options);
     };
 
-    const getAttendees = (date) => {
-        const dayAttendance = attendance[date] || {};
+    const getAttendees = (rehearsal) => {
+        const dayAttendance = rehearsal.attendance || {};
         return members.filter(m => dayAttendance[m.id]);
     };
 
@@ -132,12 +153,12 @@ const Attendance = () => {
                 )}
 
                 <div style={{ display: 'grid', gap: '1.5rem' }}>
-                    {rehearsalDates.length > 0 ? (
-                        rehearsalDates.map(date => {
-                            const attendees = getAttendees(date);
+                    {rehearsals.length > 0 ? (
+                        rehearsals.map(rehearsal => {
+                            const attendees = getAttendees(rehearsal);
                             return (
                                 <motion.div
-                                    key={date}
+                                    key={rehearsal.id}
                                     whileHover={{ y: -4 }}
                                     className="glass-card"
                                     style={{ padding: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
@@ -145,7 +166,7 @@ const Attendance = () => {
                                     <div style={{ flex: 1 }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
                                             <Calendar size={20} color="var(--accent)" />
-                                            <h3 style={{ margin: 0 }}>{formatDate(date)}</h3>
+                                            <h3 style={{ margin: 0 }}>{formatDate(rehearsal.date)}</h3>
                                         </div>
                                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '1rem' }}>
                                             {attendees.length > 0 ? (
@@ -168,14 +189,14 @@ const Attendance = () => {
                                     </div>
                                     <div style={{ display: 'flex', gap: '1rem', marginLeft: '2rem' }}>
                                         <button
-                                            onClick={() => navigate(`/admin/attendance/${date}`)}
+                                            onClick={() => navigate(`/admin/attendance/${rehearsal.date}`)}
                                             className="btn-outline"
                                             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.2rem' }}
                                         >
                                             <Edit2 size={16} /> Edit
                                         </button>
                                         <button
-                                            onClick={() => removeWeek(date)}
+                                            onClick={() => removeWeek(rehearsal.date)}
                                             style={{
                                                 color: '#ef4444',
                                                 background: 'rgba(239, 68, 68, 0.05)',
