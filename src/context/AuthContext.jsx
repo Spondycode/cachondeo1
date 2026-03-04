@@ -20,25 +20,30 @@ export const AuthProvider = ({ children }) => {
             if (firebaseUser) {
                 setLoading(true);
                 try {
-                    // Fetch extra user data from Firestore (points to 'members' collection)
                     const userDoc = await getDoc(doc(db, 'members', firebaseUser.uid));
                     const userData = userDoc.data();
 
-                    const isAdmin = firebaseUser.email === 'spondycodedev@gmail.com';
+                    const isSuperAdmin = firebaseUser.email === 'spondycodedev@gmail.com' || userData?.role === 'superadmin';
+                    const isAdmin = isSuperAdmin || userData?.role === 'admin' || userData?.isAdmin === true;
 
                     setUser({
                         uid: firebaseUser.uid,
                         email: firebaseUser.email,
-                        name: userData?.name || (isAdmin ? 'Admin' : 'Choir Member'),
+                        name: userData?.name || (isSuperAdmin ? 'Super Admin' : isAdmin ? 'Admin' : 'Choir Member'),
                         voicePart: userData?.voicePart || (isAdmin ? 'N/A' : 'Unassigned'),
-                        isAdmin: isAdmin || userData?.isAdmin || false
+                        role: userData?.role || (isSuperAdmin ? 'superadmin' : isAdmin ? 'admin' : 'member'),
+                        isAdmin: isAdmin,
+                        isSuperAdmin: isSuperAdmin
                     });
                 } catch (error) {
                     console.error("Error fetching user data:", error);
+                    const isSuperAdmin = firebaseUser.email === 'spondycodedev@gmail.com';
                     setUser({
                         uid: firebaseUser.uid,
                         email: firebaseUser.email,
-                        isAdmin: firebaseUser.email === 'spondycodedev@gmail.com'
+                        isAdmin: isSuperAdmin,
+                        isSuperAdmin: isSuperAdmin,
+                        role: isSuperAdmin ? 'superadmin' : 'member'
                     });
                 }
             } else {

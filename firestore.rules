@@ -2,10 +2,50 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    
+    // Helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function getUserData() {
+      return get(/databases/$(database)/documents/members/$(request.auth.uid)).data;
+    }
+    
+    function isSuperAdmin() {
+      let data = getUserData();
+      return isSignedIn() && (request.auth.token.email == 'spondycodedev@gmail.com' || data.role == 'superadmin');
+    }
+    
+    function isAdmin() {
+      let data = getUserData();
+      return isSignedIn() && (isSuperAdmin() || data.role == 'admin' || data.isAdmin == true);
+    }
+
+    // Members: Signed-in users can read; admins can create/update (superadmin only for roles)
+    match /members/{memberId} {
+      allow read: if isSignedIn();
+      allow create: if isAdmin();
+      allow update: if (isAdmin() && (!request.resource.data.diff(resource.data).affectedKeys().has('role') || isSuperAdmin()))
+                    || (request.auth.uid == memberId && !request.resource.data.diff(resource.data).affectedKeys().has('role')); 
+      allow delete: if isSuperAdmin();
+    }
+
+    // Songs: Signed-in users can read, admins can modify
+    match /songs/{songId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Rehearsals: Signed-in users can read, admins can modify
+    match /rehearsals/{rehearsalId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Lock down everything else
     match /{document=**} {
-      // Allow read/write to all documents for now (Development mode)
-      // This should be locked down before production
-      allow read, write: if true;
+      allow read, write: if false;
     }
   }
 }

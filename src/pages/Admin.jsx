@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Music, Plus, Trash2, Save, FileText, Link as LinkIcon, X, Edit2, Calendar } from 'lucide-react';
+import { Users, Music, Plus, Trash2, Save, FileText, Link as LinkIcon, X, Edit2, Calendar, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
 import { db, auth } from '../firebase';
 import { initializeApp, getApp, getApps } from 'firebase/app';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
@@ -36,10 +37,11 @@ const Admin = () => {
     const [activeTab, setActiveTab] = useState('members');
     const [members, setMembers] = useState([]);
     const [songs, setSongs] = useState([]);
+    const { user: currentUser } = useAuth();
     const navigate = useNavigate();
 
     // Form states
-    const [newMember, setNewMember] = useState({ name: '', email: '', phone: '', password: '', voicePart: 'Soprano' });
+    const [newMember, setNewMember] = useState({ name: '', email: '', phone: '', password: '', voicePart: 'Soprano', role: 'member' });
     const [newSong, setNewSong] = useState({ title: '', composer: '', pdf: '', audio: '', description: '' });
     const [editingMember, setEditingMember] = useState(null);
     const [message, setMessage] = useState({ text: '', type: '' });
@@ -119,7 +121,7 @@ const Admin = () => {
                 await addDoc(collection(db, 'members'), memberData);
             }
 
-            setNewMember({ name: '', email: '', phone: '', password: '', voicePart: 'Soprano' });
+            setNewMember({ name: '', email: '', phone: '', password: '', voicePart: 'Soprano', role: 'member' });
             showMessage('Member and account created successfully!');
         } catch (error) {
             console.error("Error adding member:", error);
@@ -169,6 +171,16 @@ const Admin = () => {
         } catch (error) {
             console.error("Error updating member:", error);
             showMessage('Failed to update member', 'error');
+        }
+    };
+
+    const handleUpdateRole = async (memberId, newRole) => {
+        try {
+            await updateDoc(doc(db, 'members', memberId), { role: newRole });
+            showMessage(`Role updated to ${newRole}`);
+        } catch (error) {
+            console.error("Error updating role:", error);
+            showMessage('Failed to update role', 'error');
         }
     };
 
@@ -292,7 +304,7 @@ const Admin = () => {
                                 }}>
                                     <div>Name</div>
                                     <div>Email</div>
-                                    <div>Phone</div>
+                                    <div style={{ textAlign: 'center' }}>Role</div>
                                     <div style={{ textAlign: 'center' }}>Voice</div>
                                     <div style={{ textAlign: 'right' }}>Actions</div>
                                 </div>
@@ -311,7 +323,33 @@ const Admin = () => {
                                         <div className="member-grid-layout" style={{ display: 'grid', gridTemplateColumns: 'minmax(150px, 1fr) minmax(200px, 1.5fr) minmax(130px, 1fr) 100px 80px', alignItems: 'center', gap: '1rem', width: '100%' }}>
                                             <div style={{ fontWeight: '600', color: 'var(--secondary)' }}>{member.name || 'No Name'}</div>
                                             <div style={{ color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{member.email}</div>
-                                            <div style={{ color: 'var(--text-muted)' }}>{member.phone || 'No Phone'}</div>
+                                            <div style={{ textAlign: 'center' }}>
+                                                {currentUser?.isSuperAdmin ? (
+                                                    <select
+                                                        value={member.role || (member.email === 'spondycodedev@gmail.com' ? 'superadmin' : 'member')}
+                                                        onChange={(e) => handleUpdateRole(member.id, e.target.value)}
+                                                        style={{
+                                                            padding: '0.2rem 0.4rem',
+                                                            borderRadius: '4px',
+                                                            border: '1px solid var(--glass-border)',
+                                                            fontSize: '0.8rem',
+                                                            background: 'white'
+                                                        }}
+                                                    >
+                                                        <option value="member">Member</option>
+                                                        <option value="admin">Admin</option>
+                                                        <option value="superadmin">Super Admin</option>
+                                                    </select>
+                                                ) : (
+                                                    <span style={{
+                                                        fontSize: '0.8rem',
+                                                        color: 'var(--text-muted)',
+                                                        textTransform: 'capitalize'
+                                                    }}>
+                                                        {member.role || (member.email === 'spondycodedev@gmail.com' ? 'superadmin' : 'member')}
+                                                    </span>
+                                                )}
+                                            </div>
                                             <div style={{
                                                 padding: '0.2rem 0.6rem',
                                                 borderRadius: '20px',
