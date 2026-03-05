@@ -1,19 +1,25 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { User, Save, X, ArrowLeft, Key, Music } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { User, Save, X, ArrowLeft, Key, Music, AlertTriangle, Lock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 
 const Profile = () => {
     const { user, updateUserProfile } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
     const [formData, setFormData] = useState({
         name: user?.name || '',
         voicePart: user?.voicePart || 'Soprano',
         password: '',
         confirmPassword: ''
     });
-    const [message, setMessage] = useState({ text: '', type: '' });
+    const [message, setMessage] = useState({
+        text: location.state?.weakPassword
+            ? 'SECURITY WARNING: You are using a weak password ("password123"). Please update it immediately to something secure.'
+            : '',
+        type: location.state?.weakPassword ? 'warning' : ''
+    });
 
     const voiceParts = ['Soprano', 'Alto', 'Tenor', 'Bass'];
 
@@ -75,16 +81,67 @@ const Profile = () => {
                         padding: '1rem',
                         borderRadius: '8px',
                         marginBottom: '2rem',
-                        background: message.type === 'error' ? 'rgba(255, 68, 68, 0.1)' : 'rgba(0, 200, 81, 0.1)',
-                        border: `1px solid ${message.type === 'error' ? '#ff4444' : '#00c851'}`,
-                        color: message.type === 'error' ? '#ff4444' : '#00c851',
+                        background: message.type === 'error'
+                            ? 'rgba(255, 68, 68, 0.1)'
+                            : message.type === 'warning'
+                                ? 'rgba(255, 152, 0, 0.1)'
+                                : 'rgba(0, 200, 81, 0.1)',
+                        border: `1px solid ${message.type === 'error'
+                            ? '#ff4444'
+                            : message.type === 'warning'
+                                ? '#ff9800'
+                                : '#00c851'}`,
+                        color: message.type === 'error'
+                            ? '#ff4444'
+                            : message.type === 'warning'
+                                ? '#ff9800'
+                                : '#00c851',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '0.5rem'
+                        gap: '1rem'
                     }}
                 >
-                    {message.type === 'success' ? <Save size={18} /> : <X size={18} />}
-                    {message.text}
+                    {message.type === 'success' ? <Save size={20} /> : message.type === 'warning' ? <AlertTriangle size={20} /> : <X size={20} />}
+                    <div style={{ flex: 1 }}>
+                        <div style={{
+                            fontWeight: message.type === 'warning' ? '600' : 'normal',
+                            marginBottom: message.type === 'warning' ? '1rem' : '0',
+                            textAlign: message.type === 'warning' ? 'center' : 'left'
+                        }}>
+                            {message.text}
+                        </div>
+                        {message.type === 'warning' && (
+                            <div style={{ textAlign: 'center' }}>
+                                <a
+                                    href="https://pr.tn/ref/20MQFKD0"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="btn-primary"
+                                    style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '0.5rem',
+                                        padding: '0.6rem 1.2rem',
+                                        fontSize: '0.85rem',
+                                        textDecoration: 'none',
+                                        marginBottom: '1rem'
+                                    }}
+                                >
+                                    <Lock size={14} /> Get ProtonPass (Recommended)
+                                </a>
+                                <p style={{
+                                    fontSize: '0.8rem',
+                                    color: 'inherit',
+                                    opacity: 0.8,
+                                    lineHeight: '1.4',
+                                    maxWidth: '400px',
+                                    margin: '0 auto'
+                                }}>
+                                    ProtonPass can be used for free, and if you don't want to get ProtonPass, then make sure you use the password manager in your browser or with your operating system.
+                                </p>
+                            </div>
+                        )}
+                    </div>
                 </motion.div>
             )}
 

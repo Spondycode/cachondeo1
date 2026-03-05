@@ -145,9 +145,32 @@ const RehearsalDetail = () => {
                                 </h3>
 
                                 <p style={{ fontWeight: '600', color: 'var(--text-main)', marginBottom: '0.2rem' }}>{rehearsal.location}</p>
-                                <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '0rem', lineHeight: '1.5' }}>
+                                <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '1.5rem', lineHeight: '1.5' }}>
                                     {rehearsal.address}
                                 </p>
+
+                                {rehearsal.what3wordsUrl && (
+                                    <a
+                                        href={rehearsal.what3wordsUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="btn-outline"
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            gap: '0.5rem',
+                                            padding: '0.8rem',
+                                            width: '100%',
+                                            fontSize: '0.9rem',
+                                            textDecoration: 'none',
+                                            color: '#E11F26', // what3words signature red
+                                            borderColor: '#E11F26'
+                                        }}
+                                    >
+                                        <MapPin size={16} /> what3words Address
+                                    </a>
+                                )}
                             </div>
 
                         </div>

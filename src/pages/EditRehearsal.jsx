@@ -12,7 +12,8 @@ const defaultRehearsal = {
     address: "Carrer de la Mar, 12, 17220 Sant Feliu de Guíxols, Girona, Spain",
     focus: "Final polish for the 'Summer Beach Hits' concert. We will be focusing on transitions between songs and dynamic markings in 'Dancing Queen'.",
     bring: ["Sheet music folder", "Water bottle", "Pencil for notes", "Your best energy!"],
-    imageUrl: "/Volumes/Wookie/Users/Oberyn/.gemini/antigravity/brain/c840c164-81a9-4711-9566-41aa7560605f/rehearsal_venue_mediterranean_1772487036184.png"
+    imageUrl: "/Volumes/Wookie/Users/Oberyn/.gemini/antigravity/brain/c840c164-81a9-4711-9566-41aa7560605f/rehearsal_venue_mediterranean_1772487036184.png",
+    what3wordsUrl: ""
 };
 
 const EditRehearsal = () => {
@@ -146,6 +147,20 @@ const EditRehearsal = () => {
                                     style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--glass-border)' }}
                                 />
                             </div>
+                        </div>
+
+                        {/* what3words */}
+                        <div>
+                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                what3words URL (Optional)
+                            </label>
+                            <input
+                                type="url"
+                                value={rehearsal.what3wordsUrl || ''}
+                                onChange={e => setRehearsal({ ...rehearsal, what3wordsUrl: e.target.value })}
+                                style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--glass-border)' }}
+                                placeholder="e.g., https://what3words.com/filled.count.soap"
+                            />
                         </div>
 
                         {/* Focus */}

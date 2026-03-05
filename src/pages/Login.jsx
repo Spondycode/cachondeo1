@@ -12,28 +12,38 @@ const Login = () => {
     const navigate = useNavigate();
 
     const [isLoading, setIsLoading] = useState(false);
+    const [isLoggingIn, setIsLoggingIn] = useState(false);
 
-    // Robust redirection: Whenever the user state becomes present, go to /rehearsal
+    // Auto-redirect authenticated users, but only if we're not in the middle of a login process
     React.useEffect(() => {
-        if (user) {
+        if (user && !isLoggingIn) {
             navigate('/rehearsal');
         }
-    }, [user, navigate]);
+    }, [user, navigate, isLoggingIn]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         setIsLoading(true);
+        setIsLoggingIn(true);
 
         try {
+            const isWeakPassword = password === 'password123';
             const result = await login(email, password);
-            if (!result.success) {
+
+            if (result.success) {
+                if (isWeakPassword) {
+                    navigate('/profile', { state: { weakPassword: true } });
+                } else {
+                    navigate('/rehearsal');
+                }
+            } else {
                 setError(result.error || 'Invalid login credentials.');
+                setIsLoggingIn(false);
             }
-            // Note: If success, the useEffect above will handle the navigation
-            // once the AuthContext updates the 'user' state.
         } catch (err) {
             setError("An unexpected error occurred. Please try again.");
+            setIsLoggingIn(false);
         } finally {
             setIsLoading(false);
         }
