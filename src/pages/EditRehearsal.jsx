@@ -68,7 +68,7 @@ const EditRehearsal = () => {
     if (!rehearsal) return <div className="container" style={{ padding: '6rem 0' }}>Loading...</div>;
 
     return (
-        <div className="container" style={{ padding: '6rem 0' }}>
+        <div className="container" style={{ padding: '2rem 1rem' }}>
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -96,7 +96,7 @@ const EditRehearsal = () => {
 
                     <form onSubmit={handleSave} style={{ display: 'grid', gap: '2rem' }}>
                         {/* Date and Time */}
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                        <div className="responsive-grid" style={{ '--grid-cols': '1fr 1fr', gap: '1.5rem' }}>
                             <div>
                                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
                                     <Calendar size={16} style={{ marginRight: '0.5rem' }} /> Date
@@ -124,7 +124,7 @@ const EditRehearsal = () => {
                         </div>
 
                         {/* Venue */}
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '1.5rem' }}>
+                        <div className="responsive-grid" style={{ '--grid-cols': '1fr 1.5fr', gap: '1.5rem' }}>
                             <div>
                                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
                                     <MapPin size={16} style={{ marginRight: '0.5rem' }} /> Venue Name
@@ -221,19 +221,19 @@ const EditRehearsal = () => {
                             </div>
                         </div>
 
-                        <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                        <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', flexWrap: 'wrap' }}>
                             <button
                                 type="button"
                                 onClick={() => navigate('/rehearsal')}
                                 className="btn-outline"
-                                style={{ flex: 1, padding: '1rem' }}
+                                style={{ flex: 1, padding: '1rem', minWidth: '150px' }}
                             >
                                 Cancel
                             </button>
                             <button
                                 type="submit"
                                 className="btn-primary"
-                                style={{ flex: 1, padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                                style={{ flex: 1, padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', minWidth: '150px' }}
                             >
                                 <Save size={20} /> Save Changes
                             </button>

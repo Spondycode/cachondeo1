@@ -56,12 +56,49 @@ button {
   padding: 0 2rem;
 }
 
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1rem;
+  }
+}
+
 .glass-card {
   background: var(--glass);
   backdrop-filter: blur(10px);
   border: 1px solid var(--glass-border);
   border-radius: 12px;
   padding: 2rem;
+}
+
+@media (max-width: 768px) {
+  .glass-card {
+    padding: 1.25rem;
+  }
+}
+
+.responsive-grid {
+  display: grid;
+  grid-template-columns: var(--grid-cols, 1fr 1fr);
+  gap: var(--grid-gap, 2rem);
+}
+
+@media (max-width: 992px) {
+  .responsive-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+.mobile-stack {
+  display: flex;
+  flex-direction: var(--flex-dir, row);
+}
+
+@media (max-width: 768px) {
+  .mobile-stack {
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
 }
 
 .btn-primary {

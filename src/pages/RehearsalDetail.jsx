@@ -46,7 +46,7 @@ const RehearsalDetail = () => {
     if (!rehearsal) return <div className="container" style={{ padding: '6rem 0' }}>Loading...</div>;
 
     return (
-        <div className="container" style={{ padding: '6rem 0' }}>
+        <div className="container" style={{ padding: '2rem 1rem' }}>
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -76,16 +76,19 @@ const RehearsalDetail = () => {
                         <div style={{
                             position: 'absolute',
                             inset: 0,
-                            padding: '1rem',
+                            padding: '1.5rem',
                             background: 'rgba(0, 31, 63, 0.9)', // Solid dark blue with high opacity
                             color: 'white',
                             display: 'flex',
+                            flexDirection: 'row',
                             justifyContent: 'space-between',
-                            alignItems: 'flex-end'
+                            alignItems: 'flex-end',
+                            flexWrap: 'wrap',
+                            gap: '1rem'
                         }}>
                             <div>
-                                <h1 style={{ fontSize: '2.5rem', marginBottom: '0.5rem', color: 'white' }}>Next Rehearsal</h1>
-                                <div style={{ display: 'flex', gap: '1.5rem', fontSize: '1rem', color: 'white', fontWeight: '500' }}>
+                                <h1 style={{ fontSize: 'clamp(1.5rem, 5vw, 2.5rem)', marginBottom: '0.5rem', color: 'white' }}>Next Rehearsal</h1>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', fontSize: '0.9rem', color: 'white', fontWeight: '500' }}>
                                     <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                                         <Calendar size={18} /> {rehearsal.date}
                                     </span>
@@ -106,8 +109,8 @@ const RehearsalDetail = () => {
                         </div>
                     </div>
 
-                    <div style={{ padding: '3rem' }}>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '3rem' }}>
+                    <div className="glass-card" style={{ padding: '2rem' }}>
+                        <div className="responsive-grid" style={{ '--grid-cols': '1.5fr 1fr' }}>
                             {/* Main Info */}
                             <div>
                                 <section style={{ marginBottom: '2.5rem' }}>

@@ -42,6 +42,7 @@ const Admin = () => {
 
     // Form states
     const [newMember, setNewMember] = useState({ name: '', email: '', phone: '', password: '', voicePart: 'Soprano', role: 'member' });
+    const [newSong, setNewSong] = useState({ title: '', composer: '', pdf: '', audio: '', description: '' });
     const [messages, setMessages] = useState([]);
     const [editingMember, setEditingMember] = useState(null);
     const [message, setMessage] = useState({ text: '', type: '' });
@@ -183,6 +184,18 @@ const Admin = () => {
         } catch (error) {
             console.error("Error updating member:", error);
             showMessage('Failed to update member', 'error');
+        }
+    };
+
+    const handleUpdateRole = async (memberId, newRole) => {
+        try {
+            await updateDoc(doc(db, 'members', memberId), {
+                role: newRole
+            });
+            showMessage(`Role updated to ${newRole}`);
+        } catch (error) {
+            console.error("Error updating role:", error);
+            showMessage('Failed to update role', 'error');
         }
     };
 

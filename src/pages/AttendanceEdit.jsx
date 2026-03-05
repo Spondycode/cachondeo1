@@ -78,12 +78,12 @@ const AttendanceEdit = () => {
     };
 
     return (
-        <div className="container" style={{ padding: '4rem 2rem' }}>
+        <div className="container" style={{ padding: '2rem 1rem' }}>
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
             >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem' }}>
+                <div className="mobile-stack" style={{ justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem', '--flex-dir': 'row' }}>
                     <div>
                         <button
                             onClick={() => navigate('/admin/attendance')}
@@ -98,26 +98,26 @@ const AttendanceEdit = () => {
                                 cursor: 'pointer',
                                 padding: 0,
                                 marginBottom: '0.5rem',
-                                fontSize: '0.9rem'
+                                fontSize: '0.8rem'
                             }}
                         >
-                            <ArrowLeft size={16} /> Back to Attendance Log
+                            <ArrowLeft size={16} /> Back
                         </button>
-                        <h1 style={{ fontSize: '2.5rem', margin: 0 }}>Mark Attendance</h1>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
+                        <h1 style={{ fontSize: 'clamp(1.5rem, 5vw, 2.5rem)', margin: 0 }}>Mark Attendance</h1>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', marginTop: '0.5rem', fontSize: '0.9rem' }}>
                             <Calendar size={18} />
                             <span style={{ fontWeight: '600' }}>{formatDate(date)}</span>
                         </div>
                     </div>
 
-                    <div className="glass-card" style={{ padding: '1rem 1.5rem', display: 'flex', gap: '2rem' }}>
+                    <div className="glass-card" style={{ padding: '0.75rem 1rem', display: 'flex', gap: '1.5rem', width: 'fit-content' }}>
                         <div style={{ textAlign: 'center' }}>
-                            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--accent)' }}>{stats.attended}</div>
-                            <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)' }}>Present</div>
+                            <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--accent)' }}>{stats.attended}</div>
+                            <div style={{ fontSize: '0.6rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)' }}>Present</div>
                         </div>
                         <div style={{ textAlign: 'center' }}>
-                            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--secondary)' }}>{stats.total}</div>
-                            <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)' }}>Total Members</div>
+                            <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--secondary)' }}>{stats.total}</div>
+                            <div style={{ fontSize: '0.6rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)' }}>Members</div>
                         </div>
                     </div>
                 </div>
@@ -141,7 +141,7 @@ const AttendanceEdit = () => {
                 )}
 
                 <div className="glass-card" style={{ padding: '0.5rem' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '0.75rem' }}>
                         {members.map(member => (
                             <motion.div
                                 key={member.id}
