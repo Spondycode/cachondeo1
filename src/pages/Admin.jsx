@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Music, Plus, Trash2, Save, FileText, Link as LinkIcon, X, Edit2, Calendar, Shield, Mail, Settings as SettingsIcon, MessageSquare } from 'lucide-react';
+import { Users, Music, Plus, Trash2, Save, FileText, Link as LinkIcon, X, Edit2, Calendar, Shield, Mail, MessageSquare } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { db, auth } from '../firebase';
@@ -43,7 +43,6 @@ const Admin = () => {
     // Form states
     const [newMember, setNewMember] = useState({ name: '', email: '', phone: '', password: '', voicePart: 'Soprano', role: 'member' });
     const [messages, setMessages] = useState([]);
-    const [settings, setSettings] = useState({ contactEmail: '' });
     const [editingMember, setEditingMember] = useState(null);
     const [message, setMessage] = useState({ text: '', type: '' });
 
@@ -78,18 +77,10 @@ const Admin = () => {
             setMessages(messagesData);
         });
 
-        // Real-time listener for settings
-        const unsubscribeSettings = onSnapshot(doc(db, 'settings', 'contact'), (docSnap) => {
-            if (docSnap.exists()) {
-                setSettings(docSnap.data());
-            }
-        });
-
         return () => {
             unsubscribeMembers();
             unsubscribeSongs();
             unsubscribeMessages();
-            unsubscribeSettings();
         };
     }, []);
 
@@ -195,16 +186,6 @@ const Admin = () => {
         }
     };
 
-    const handleUpdateSettings = async (e) => {
-        e.preventDefault();
-        try {
-            await setDoc(doc(db, 'settings', 'contact'), settings);
-            showMessage('Settings updated successfully');
-        } catch (error) {
-            console.error("Error updating settings:", error);
-            showMessage('Failed to update settings', 'error');
-        }
-    };
 
     const deleteMessage = async (id) => {
         try {
@@ -469,31 +450,7 @@ const Admin = () => {
                         </div>
                     </div>
                 );
-            case 'settings':
-                return (
-                    <div>
-                        <h2 style={{ marginBottom: '1.5rem', color: 'var(--secondary)' }}>General Settings</h2>
-                        <form onSubmit={handleUpdateSettings} style={{ display: 'grid', gap: '1.5rem', maxWidth: '500px' }}>
-                            <div>
-                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Contact Form Notification Email</label>
-                                <input
-                                    type="email"
-                                    placeholder="Email to display on Admin page"
-                                    value={settings.contactEmail}
-                                    onChange={e => setSettings({ ...settings, contactEmail: e.target.value })}
-                                    required
-                                    style={{ width: '100%', padding: '0.8rem', borderRadius: '4px', border: '1px solid var(--glass-border)' }}
-                                />
-                                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
-                                    This is the email address where you'd like to reach out to.
-                                </p>
-                            </div>
-                            <button type="submit" className="btn-primary" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', padding: '0.8rem' }}>
-                                <Save size={20} /> Save Settings
-                            </button>
-                        </form>
-                    </div>
-                );
+
             default:
                 return null;
         }
@@ -546,13 +503,7 @@ const Admin = () => {
                 >
                     <MessageSquare size={20} /> Messages
                 </button>
-                <button
-                    onClick={() => setActiveTab('settings')}
-                    className={activeTab === 'settings' ? 'btn-primary' : 'btn-outline'}
-                    style={{ flex: '1 1 200px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
-                >
-                    <SettingsIcon size={20} /> Settings
-                </button>
+
                 <button
                     onClick={() => navigate('/admin/attendance')}
                     className="btn-outline"
