@@ -14,7 +14,7 @@ const Footer = () => {
                     fontSize: '0.8rem',
                     color: 'var(--text-muted)'
                 }}>
-                    &copy; {new Date().getFullYear()} Cachondeo Choir. All rights reserved.
+                    &copy; {new Date().getFullYear()} Website by Spondycode David Allen.
                 </div>
             </div>
         </footer>
