@@ -120,7 +120,7 @@ const Home = () => {
                             },
                             {
                                 q: "When and where do you meet?",
-                                a: "Every Thursday at 7:00 PM at the Costa Brava Community Arts Center. Check the rehearsals page for current details!"
+                                a: "Every Monday at 5:00 PM at IVO's Bar in Palafrugell. Check the rehearsals page for current details!"
                             },
                             {
                                 q: "Do I need to read music?",
