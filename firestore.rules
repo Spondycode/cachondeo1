@@ -49,6 +49,12 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Messages: Anyone can create; admins can read and delete
+    match /messages/{messageId} {
+      allow create: if true;
+      allow read, delete: if isAdmin();
+    }
+
     // Lock down everything else
     match /{document=**} {
       allow read, write: if false;

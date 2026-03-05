@@ -19,6 +19,7 @@ import Attendance from './pages/Attendance';
 import AttendanceEdit from './pages/AttendanceEdit';
 
 import SignUp from './pages/SignUp';
+import Contact from './pages/Contact';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/repertoire" element={<PublicRepertoire />} />
+              <Route path="/contact" element={<Contact />} />
               {/* Hidden Sign Up Page */}
               <Route path="/918273645042" element={<SignUp />} />
               <Route

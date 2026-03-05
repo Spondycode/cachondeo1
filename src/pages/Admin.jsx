@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Music, Plus, Trash2, Save, FileText, Link as LinkIcon, X, Edit2, Calendar, Shield } from 'lucide-react';
+import { Users, Music, Plus, Trash2, Save, FileText, Link as LinkIcon, X, Edit2, Calendar, Shield, Mail, Settings as SettingsIcon, MessageSquare } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { db, auth } from '../firebase';
@@ -42,7 +42,8 @@ const Admin = () => {
 
     // Form states
     const [newMember, setNewMember] = useState({ name: '', email: '', phone: '', password: '', voicePart: 'Soprano', role: 'member' });
-    const [newSong, setNewSong] = useState({ title: '', composer: '', pdf: '', audio: '', description: '' });
+    const [messages, setMessages] = useState([]);
+    const [settings, setSettings] = useState({ contactEmail: '' });
     const [editingMember, setEditingMember] = useState(null);
     const [message, setMessage] = useState({ text: '', type: '' });
 
@@ -67,9 +68,28 @@ const Admin = () => {
             setSongs(songsData);
         });
 
+        // Real-time listener for messages
+        const messagesQuery = query(collection(db, 'messages'), orderBy('timestamp', 'desc'));
+        const unsubscribeMessages = onSnapshot(messagesQuery, (snapshot) => {
+            const messagesData = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setMessages(messagesData);
+        });
+
+        // Real-time listener for settings
+        const unsubscribeSettings = onSnapshot(doc(db, 'settings', 'contact'), (docSnap) => {
+            if (docSnap.exists()) {
+                setSettings(docSnap.data());
+            }
+        });
+
         return () => {
             unsubscribeMembers();
             unsubscribeSongs();
+            unsubscribeMessages();
+            unsubscribeSettings();
         };
     }, []);
 
@@ -175,68 +195,31 @@ const Admin = () => {
         }
     };
 
-    const handleUpdateRole = async (memberId, newRole) => {
+    const handleUpdateSettings = async (e) => {
+        e.preventDefault();
         try {
-            await updateDoc(doc(db, 'members', memberId), { role: newRole });
-            showMessage(`Role updated to ${newRole}`);
+            await setDoc(doc(db, 'settings', 'contact'), settings);
+            showMessage('Settings updated successfully');
         } catch (error) {
-            console.error("Error updating role:", error);
-            showMessage('Failed to update role', 'error');
+            console.error("Error updating settings:", error);
+            showMessage('Failed to update settings', 'error');
         }
     };
 
-    return (
-        <div className="container" style={{ padding: '6rem 2rem' }}>
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                style={{ marginBottom: '3rem' }}
-            >
-                <h1 style={{ fontSize: '3rem', marginBottom: '1rem', color: 'var(--secondary)' }}>ADMIN DASHBOARD</h1>
-                <p style={{ color: 'var(--text-muted)' }}>Manage choir members and repertoire.</p>
-                <div style={{ width: '100px', height: '2px', background: 'var(--accent)', marginTop: '1.5rem' }}></div>
-            </motion.div>
+    const deleteMessage = async (id) => {
+        try {
+            await deleteDoc(doc(db, 'messages', id));
+            showMessage('Message deleted');
+        } catch (error) {
+            console.error("Error deleting message:", error);
+            showMessage('Failed to delete message', 'error');
+        }
+    };
 
-            {message.text && (
-                <div style={{
-                    padding: '1rem',
-                    borderRadius: '4px',
-                    marginBottom: '2rem',
-                    background: message.type === 'error' ? 'rgba(255,0,0,0.1)' : 'rgba(0,128,0,0.1)',
-                    border: `1px solid ${message.type === 'error' ? 'red' : 'green'}`,
-                    color: message.type === 'error' ? 'red' : 'green'
-                }}>
-                    {message.text}
-                </div>
-            )}
-
-            <div className="admin-nav-buttons" style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
-                <button
-                    onClick={() => setActiveTab('members')}
-                    className={activeTab === 'members' ? 'btn-primary' : 'btn-outline'}
-                    style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
-                >
-                    <Users size={20} /> Manage Members
-                </button>
-                <button
-                    onClick={() => setActiveTab('songs')}
-                    className={activeTab === 'songs' ? 'btn-primary' : 'btn-outline'}
-                    style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
-                >
-                    <Music size={20} /> Manage Repertoire
-                </button>
-                <button
-                    onClick={() => navigate('/admin/attendance')}
-                    className="btn-outline"
-                    style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
-                >
-                    <Calendar size={20} /> Register Attendance
-                </button>
-            </div>
-
-
-            <div className="glass-card" style={{ padding: '2rem' }}>
-                {activeTab === 'members' ? (
+    const renderTabContent = () => {
+        switch (activeTab) {
+            case 'members':
+                return (
                     <div>
                         <h2 style={{ marginBottom: '1.5rem', color: 'var(--secondary)' }}>Add New Member</h2>
                         <form onSubmit={handleAddMember} className="admin-form" style={{ gap: '1rem', marginBottom: '2rem' }}>
@@ -383,7 +366,9 @@ const Admin = () => {
                             {members.length === 0 && <p style={{ color: 'var(--text-muted)' }}>No members added yet.</p>}
                         </div>
                     </div>
-                ) : (
+                );
+            case 'songs':
+                return (
                     <div>
                         <h2 style={{ marginBottom: '1.5rem', color: 'var(--secondary)' }}>Add New Song</h2>
                         <form onSubmit={handleAddSong} style={{ display: 'grid', gap: '1rem', marginBottom: '3rem' }}>
@@ -456,7 +441,130 @@ const Admin = () => {
                             ))}
                         </div>
                     </div>
-                )}
+                );
+            case 'messages':
+                return (
+                    <div>
+                        <h2 style={{ marginBottom: '1.5rem', color: 'var(--secondary)' }}>Contact Messages</h2>
+                        <div style={{ display: 'grid', gap: '1rem' }}>
+                            {messages.map(msg => (
+                                <div key={msg.id} className="admin-list-card" style={{ padding: '1rem', background: 'var(--white)', borderRadius: '4px', border: '1px solid var(--glass-border)' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                                        <span style={{ fontWeight: '600', color: 'var(--secondary)' }}>From: {msg.email}</span>
+                                        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                                            {msg.timestamp?.seconds ? new Date(msg.timestamp.seconds * 1000).toLocaleString() : 'Just now'}
+                                        </span>
+                                    </div>
+                                    <div style={{ marginBottom: '1rem', color: 'var(--text-main)', whiteSpace: 'pre-wrap' }}>
+                                        {msg.message}
+                                    </div>
+                                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                        <button onClick={() => deleteMessage(msg.id)} style={{ color: 'red', background: 'none', border: 'none', cursor: 'pointer' }}>
+                                            <Trash2 size={18} />
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                            {messages.length === 0 && <p style={{ color: 'var(--text-muted)' }}>No messages received yet.</p>}
+                        </div>
+                    </div>
+                );
+            case 'settings':
+                return (
+                    <div>
+                        <h2 style={{ marginBottom: '1.5rem', color: 'var(--secondary)' }}>General Settings</h2>
+                        <form onSubmit={handleUpdateSettings} style={{ display: 'grid', gap: '1.5rem', maxWidth: '500px' }}>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Contact Form Notification Email</label>
+                                <input
+                                    type="email"
+                                    placeholder="Email to display on Admin page"
+                                    value={settings.contactEmail}
+                                    onChange={e => setSettings({ ...settings, contactEmail: e.target.value })}
+                                    required
+                                    style={{ width: '100%', padding: '0.8rem', borderRadius: '4px', border: '1px solid var(--glass-border)' }}
+                                />
+                                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
+                                    This is the email address where you'd like to reach out to.
+                                </p>
+                            </div>
+                            <button type="submit" className="btn-primary" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', padding: '0.8rem' }}>
+                                <Save size={20} /> Save Settings
+                            </button>
+                        </form>
+                    </div>
+                );
+            default:
+                return null;
+        }
+    };
+
+    return (
+        <div className="container" style={{ padding: '6rem 2rem' }}>
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                style={{ marginBottom: '3rem' }}
+            >
+                <h1 style={{ fontSize: '3rem', marginBottom: '1rem', color: 'var(--secondary)' }}>ADMIN DASHBOARD</h1>
+                <p style={{ color: 'var(--text-muted)' }}>Manage choir members and repertoire.</p>
+                <div style={{ width: '100px', height: '2px', background: 'var(--accent)', marginTop: '1.5rem' }}></div>
+            </motion.div>
+
+            {message.text && (
+                <div style={{
+                    padding: '1rem',
+                    borderRadius: '4px',
+                    marginBottom: '2rem',
+                    background: message.type === 'error' ? 'rgba(255,0,0,0.1)' : 'rgba(0,128,0,0.1)',
+                    border: `1px solid ${message.type === 'error' ? 'red' : 'green'}`,
+                    color: message.type === 'error' ? 'red' : 'green'
+                }}>
+                    {message.text}
+                </div>
+            )}
+
+            <div className="admin-nav-buttons" style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
+                <button
+                    onClick={() => setActiveTab('members')}
+                    className={activeTab === 'members' ? 'btn-primary' : 'btn-outline'}
+                    style={{ flex: '1 1 200px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                >
+                    <Users size={20} /> Members
+                </button>
+                <button
+                    onClick={() => setActiveTab('songs')}
+                    className={activeTab === 'songs' ? 'btn-primary' : 'btn-outline'}
+                    style={{ flex: '1 1 200px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                >
+                    <Music size={20} /> Repertoire
+                </button>
+                <button
+                    onClick={() => setActiveTab('messages')}
+                    className={activeTab === 'messages' ? 'btn-primary' : 'btn-outline'}
+                    style={{ flex: '1 1 200px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                >
+                    <MessageSquare size={20} /> Messages
+                </button>
+                <button
+                    onClick={() => setActiveTab('settings')}
+                    className={activeTab === 'settings' ? 'btn-primary' : 'btn-outline'}
+                    style={{ flex: '1 1 200px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                >
+                    <SettingsIcon size={20} /> Settings
+                </button>
+                <button
+                    onClick={() => navigate('/admin/attendance')}
+                    className="btn-outline"
+                    style={{ flex: '1 1 200px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                >
+                    <Calendar size={20} /> Attendance
+                </button>
+            </div>
+
+
+            <div className="glass-card" style={{ padding: '2rem' }}>
+                {renderTabContent()}
             </div>
 
             {/* Edit Member Modal */}

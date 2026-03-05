@@ -39,6 +39,15 @@ const Navbar = () => {
                     </span>
                 </Link>
 
+                <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+                    <Link
+                        to="/contact"
+                        style={{ color: 'var(--text-main)', textDecoration: 'none', fontWeight: '500', fontSize: '0.9rem' }}
+                    >
+                        Contact
+                    </Link>
+                </div>
+
                 {/* Mobile Toggle Button */}
                 <button className="mobile-toggle" onClick={toggleMenu} aria-label="Toggle menu">
                     {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
@@ -89,9 +98,28 @@ const Navbar = () => {
                         </div>
                     )}
                     {!user && (
-                        <Link to="/login" className="btn-primary" onClick={() => setIsMenuOpen(false)} style={{ padding: '0.6rem 1.5rem', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <LogIn size={18} />
-                            Member Login
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', width: '100%' }}>
+                            <Link
+                                to="/contact"
+                                onClick={() => setIsMenuOpen(false)}
+                                style={{ color: 'var(--text-main)', textDecoration: 'none', fontWeight: '500', fontSize: '0.9rem' }}
+                            >
+                                Contact
+                            </Link>
+                            <Link to="/login" className="btn-primary" onClick={() => setIsMenuOpen(false)} style={{ padding: '0.6rem 1.5rem', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem', width: 'fit-content' }}>
+                                <LogIn size={18} />
+                                Member Login
+                            </Link>
+                        </div>
+                    )}
+                    {user && (
+                        <Link
+                            to="/contact"
+                            onClick={() => setIsMenuOpen(false)}
+                            className="mobile-only"
+                            style={{ color: 'var(--text-main)', textDecoration: 'none', fontWeight: '500', fontSize: '0.9rem', marginTop: '1rem', display: 'none' }}
+                        >
+                            Contact
                         </Link>
                     )}
                 </div>
