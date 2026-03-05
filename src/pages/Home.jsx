@@ -98,7 +98,95 @@ const Home = () => {
                     </div>
                 </div>
             </section>
+
+            {/* FAQ Section */}
+            <section style={{ padding: '4rem 0', background: 'var(--white)' }}>
+                <div className="container">
+                    <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+                        <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Frequently Asked Questions</h2>
+                        <p style={{ color: 'var(--text-muted)' }}>Everything you need to know about joining our choir.</p>
+                        <div style={{ width: '60px', height: '3px', background: 'var(--accent)', margin: '1.5rem auto 0' }}></div>
+                    </div>
+
+                    <div style={{ maxWidth: '800px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        {[
+                            {
+                                q: "Do you have to be a good singer to join the choir?",
+                                a: "Of course not! Everybody is welcome. It's all about having fun singing and being part of a community."
+                            },
+                            {
+                                q: "What kind of music do you sing?",
+                                a: "We sing a vibrant mix of popular hits, from classic rock and soul anthems to modern pop favorites."
+                            },
+                            {
+                                q: "When and where do you meet?",
+                                a: "Every Thursday at 7:00 PM at the Costa Brava Community Arts Center. Check the rehearsals page for current details!"
+                            },
+                            {
+                                q: "Do I need to read music?",
+                                a: "Not at all! We provide audio tracks and support to help everyone learn, regardless of their musical background."
+                            }
+                        ].map((faq, index) => (
+                            <FAQItem key={index} question={faq.q} answer={faq.a} />
+                        ))}
+                    </div>
+                </div>
+            </section>
         </div>
+    );
+};
+
+const FAQItem = ({ question, answer }) => {
+    const [isOpen, setIsOpen] = React.useState(false);
+
+    return (
+        <motion.div
+            layout
+            className="glass-card"
+            onClick={() => setIsOpen(!isOpen)}
+            style={{
+                cursor: 'pointer',
+                padding: '1.5rem',
+                border: '1px solid var(--glass-border)',
+                overflow: 'hidden'
+            }}
+        >
+            <motion.div
+                layout="position"
+                style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                }}
+            >
+                <h3 style={{
+                    fontSize: '1.1rem',
+                    margin: 0,
+                    color: isOpen ? 'var(--secondary)' : 'var(--text-main)',
+                    fontFamily: 'Inter, sans-serif',
+                    fontWeight: 600
+                }}>
+                    {question}
+                </h3>
+                <motion.span
+                    animate={{ rotate: isOpen ? 180 : 0 }}
+                    style={{ color: 'var(--secondary)', display: 'flex' }}
+                >
+                    <ArrowRight size={20} />
+                </motion.span>
+            </motion.div>
+
+            {isOpen && (
+                <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    transition={{ duration: 0.3 }}
+                    style={{ marginTop: '1rem', color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: '1.6' }}
+                >
+                    {answer}
+                </motion.div>
+            )}
+        </motion.div>
     );
 };
 

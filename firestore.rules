@@ -25,7 +25,7 @@ service cloud.firestore {
     // Members: Signed-in users can read; admins can create/update (superadmin only for roles)
     match /members/{memberId} {
       allow read: if isSignedIn();
-      allow create: if isAdmin();
+      allow create: if isAdmin() || (isSignedIn() && request.auth.uid == memberId && request.resource.data.role == 'member');
       allow update: if (isAdmin() && (!request.resource.data.diff(resource.data).affectedKeys().has('role') || isSuperAdmin()))
                     || (request.auth.uid == memberId && !request.resource.data.diff(resource.data).affectedKeys().has('role')); 
       allow delete: if isSuperAdmin();

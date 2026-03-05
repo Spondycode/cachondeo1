@@ -18,6 +18,8 @@ import PublicRepertoire from './pages/PublicRepertoire';
 import Attendance from './pages/Attendance';
 import AttendanceEdit from './pages/AttendanceEdit';
 
+import SignUp from './pages/SignUp';
+
 function App() {
   return (
     <AuthProvider>
@@ -29,6 +31,8 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/repertoire" element={<PublicRepertoire />} />
+              {/* Hidden Sign Up Page */}
+              <Route path="/918273645042" element={<SignUp />} />
               <Route
                 path="/members"
                 element={

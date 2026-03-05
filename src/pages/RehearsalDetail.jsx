@@ -17,7 +17,8 @@ const defaultRehearsal = {
 };
 
 const RehearsalDetail = () => {
-    const { user, isAdmin } = useAuth();
+    const { user } = useAuth();
+    const isAdmin = user?.isAdmin || user?.isSuperAdmin;
     const navigate = useNavigate();
     const [rehearsal, setRehearsal] = useState(null);
 

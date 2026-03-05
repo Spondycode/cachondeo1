@@ -20,12 +20,12 @@ import {
 
 // Secondary Firebase app for creating users without logging out the admin
 const firebaseConfig = {
-    apiKey: "AIzaSyC1SFPcV5LBbXsAfudv2_HgDBpxms0c95s",
-    authDomain: "cachy-5edef.firebaseapp.com",
-    projectId: "cachy-5edef",
-    storageBucket: "cachy-5edef.firebasestorage.app",
-    messagingSenderId: "1067901621037",
-    appId: "1:1067901621037:web:f2b36355a44f69168839a4"
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
 const secondaryApp = getApps().length > 1
@@ -109,8 +109,9 @@ const Admin = () => {
             // 2. Add member document to Firestore
             // Use setDoc with the Auth UID if possible, or addDoc
             const uid = userCredential ? userCredential.user.uid : null;
+            const { password, ...firestoreMemberData } = newMember;
             const memberData = {
-                ...newMember,
+                ...firestoreMemberData,
                 uid: uid,
                 createdAt: new Date().toISOString()
             };
@@ -164,7 +165,7 @@ const Admin = () => {
     const handleSaveEdit = async (e) => {
         e.preventDefault();
         try {
-            const { id, ...data } = editingMember;
+            const { id, password, ...data } = editingMember;
             await updateDoc(doc(db, 'members', id), data);
             setEditingMember(null);
             showMessage('Member updated successfully');
@@ -512,16 +513,6 @@ const Admin = () => {
                                     type="tel"
                                     value={editingMember.phone || ''}
                                     onChange={e => setEditingMember({ ...editingMember, phone: e.target.value })}
-                                    style={{ width: '100%', padding: '0.8rem', borderRadius: '4px', border: '1px solid var(--glass-border)' }}
-                                />
-                            </div>
-                            <div>
-                                <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.3rem', display: 'block' }}>Password</label>
-                                <input
-                                    type="text"
-                                    value={editingMember.password}
-                                    onChange={e => setEditingMember({ ...editingMember, password: e.target.value })}
-                                    required
                                     style={{ width: '100%', padding: '0.8rem', borderRadius: '4px', border: '1px solid var(--glass-border)' }}
                                 />
                             </div>

@@ -3,7 +3,8 @@ import { auth, db } from '../firebase';
 import {
     onAuthStateChanged,
     signInWithEmailAndPassword,
-    signOut
+    signOut,
+    updatePassword
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 
@@ -80,9 +81,18 @@ export const AuthProvider = ({ children }) => {
     const updateUserProfile = async (updatedData) => {
         if (!user) return false;
         try {
+            const { password, ...firestoreData } = updatedData;
+
+            // 1. If password is provided, update it in Firebase Auth
+            if (password) {
+                await updatePassword(auth.currentUser, password);
+            }
+
+            // 2. Update other fields in Firestore
             const userRef = doc(db, 'members', user.uid);
-            await setDoc(userRef, updatedData, { merge: true });
-            setUser(prev => ({ ...prev, ...updatedData }));
+            await setDoc(userRef, firestoreData, { merge: true });
+
+            setUser(prev => ({ ...prev, ...firestoreData }));
             return true;
         } catch (error) {
             console.error("Profile update failed:", error.message);
