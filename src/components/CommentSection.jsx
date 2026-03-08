@@ -158,6 +158,31 @@ const CommentSection = ({ songId }) => {
         }
     };
 
+    const handleDeleteThread = async (commentId, replies = []) => {
+        if (!window.confirm("Are you sure you want to delete this entire message thread?")) return;
+
+        setSubmitting(true);
+        setError(null);
+        try {
+            const batch = writeBatch(db);
+
+            // Delete the main comment
+            batch.delete(doc(db, 'comments', commentId));
+
+            // Delete all replies
+            replies.forEach(reply => {
+                batch.delete(doc(db, 'comments', reply.id));
+            });
+
+            await batch.commit();
+        } catch (err) {
+            console.error("Error deleting thread:", err);
+            setError(`Failed to delete thread: ${err.message}`);
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
     const handleDeleteAll = async () => {
         if (!window.confirm("WARNING: This will delete ALL comments and replies for this song. This action cannot be undone. Are you sure?")) return;
 
@@ -259,6 +284,7 @@ const CommentSection = ({ songId }) => {
                             handlePostReply={handlePostReply}
                             handleUpdateComment={handleUpdateComment}
                             handleDeleteComment={handleDeleteComment}
+                            handleDeleteThread={handleDeleteThread}
                             submitting={submitting}
                             setError={setError}
                         />
@@ -280,6 +306,7 @@ const CommentCard = ({
     handlePostReply,
     handleUpdateComment,
     handleDeleteComment,
+    handleDeleteThread,
     submitting,
     setError
 }) => {
@@ -307,6 +334,15 @@ const CommentCard = ({
                     </div>
                     <span className="user-name">{comment.userName}</span>
                 </div>
+                {isAdmin && !isReply && (
+                    <button
+                        className="btn-admin-delete-thread"
+                        onClick={() => handleDeleteThread(comment.id, comment.replies)}
+                        title="Delete Entire Thread"
+                    >
+                        <Trash2 size={14} /> Delete Thread
+                    </button>
+                )}
                 <div className="comment-meta">
                     <span className="comment-date">
                         {comment.timestamp?.toDate().toLocaleDateString() || 'Just now'}
@@ -415,6 +451,7 @@ const CommentCard = ({
                             handlePostReply={handlePostReply}
                             handleUpdateComment={handleUpdateComment}
                             handleDeleteComment={handleDeleteComment}
+                            handleDeleteThread={handleDeleteThread}
                             submitting={submitting}
                             setError={setError}
                         />

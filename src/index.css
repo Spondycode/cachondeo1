@@ -343,6 +343,28 @@ body,
   cursor: not-allowed;
 }
 
+.btn-admin-delete-thread {
+  background: rgba(255, 107, 107, 0.05);
+  color: var(--accent);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: 1rem;
+  transition: all 0.2s ease;
+}
+
+.btn-admin-delete-thread:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+  box-shadow: 0 4px 10px rgba(255, 107, 107, 0.2);
+}
+
 .section-header h3 {
   font-family: 'Playfair Display', serif;
   font-size: 1.5rem;
