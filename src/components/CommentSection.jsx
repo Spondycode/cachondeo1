@@ -159,6 +159,7 @@ const CommentSection = ({ songId }) => {
     };
 
     const handleDeleteThread = async (commentId, replies = []) => {
+        console.log("Deleting thread:", commentId, "with replies:", replies);
         if (!window.confirm("Are you sure you want to delete this entire message thread?")) return;
 
         setSubmitting(true);
@@ -219,7 +220,7 @@ const CommentSection = ({ songId }) => {
             <div className="section-header">
                 <div className="header-left">
                     <MessageSquare size={24} />
-                    <h3>Member Comments & Messages</h3>
+                    <h3>Questions, Comments & Messages</h3>
                 </div>
                 {isAdmin && comments.length > 0 && (
                     <button
@@ -337,7 +338,11 @@ const CommentCard = ({
                 {isAdmin && !isReply && (
                     <button
                         className="btn-admin-delete-thread"
-                        onClick={() => handleDeleteThread(comment.id, comment.replies)}
+                        onClick={() => {
+                            console.log("Delete Thread clicked for:", comment.id);
+                            handleDeleteThread(comment.id, comment.replies);
+                        }}
+                        disabled={submitting}
                         title="Delete Entire Thread"
                     >
                         <Trash2 size={14} /> Delete Thread
