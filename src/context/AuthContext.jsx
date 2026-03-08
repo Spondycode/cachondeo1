@@ -4,7 +4,8 @@ import {
     onAuthStateChanged,
     signInWithEmailAndPassword,
     signOut,
-    updatePassword
+    updatePassword,
+    sendPasswordResetEmail
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 
@@ -61,11 +62,24 @@ export const AuthProvider = ({ children }) => {
             await signInWithEmailAndPassword(auth, email, password);
             return { success: true };
         } catch (error) {
-            console.error("Login failed:", error.message);
+            console.error("Login failed:", error.code, error.message);
             let message = "Invalid email or password.";
             if (error.code === 'auth/user-not-found') message = "No account found with this email.";
             if (error.code === 'auth/wrong-password') message = "Incorrect password.";
             if (error.code === 'auth/invalid-credential') message = "Invalid login credentials.";
+            return { success: false, error: message, code: error.code };
+        }
+    };
+
+    const resetPassword = async (email) => {
+        try {
+            await sendPasswordResetEmail(auth, email);
+            return { success: true };
+        } catch (error) {
+            console.error("Password reset failed:", error.code, error.message);
+            let message = "Failed to send reset email.";
+            if (error.code === 'auth/user-not-found') message = "No account found with this email.";
+            if (error.code === 'auth/invalid-email') message = "Invalid email address.";
             return { success: false, error: message };
         }
     };
@@ -104,6 +118,7 @@ export const AuthProvider = ({ children }) => {
         user,
         login,
         logout,
+        resetPassword,
         updateUserProfile,
         loading
     };

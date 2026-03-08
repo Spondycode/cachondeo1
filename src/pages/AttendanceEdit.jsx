@@ -141,14 +141,14 @@ const AttendanceEdit = () => {
                 )}
 
                 <div className="glass-card" style={{ padding: '0.5rem' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '0.75rem' }}>
+                    <div className="attendance-edit-grid">
                         {members.map(member => (
                             <motion.div
                                 key={member.id}
                                 whileHover={{ scale: 1.01 }}
                                 onClick={() => toggleAttendance(member.id)}
                                 style={{
-                                    padding: '1.25rem',
+                                    padding: '0.75rem 0.6rem',
                                     borderRadius: '12px',
                                     background: attendance[member.id] ? 'var(--accent-light)' : 'rgba(255,255,255,0.5)',
                                     border: '1px solid',
@@ -157,26 +157,37 @@ const AttendanceEdit = () => {
                                     display: 'flex',
                                     justifyContent: 'space-between',
                                     alignItems: 'center',
-                                    transition: 'all 0.2s ease'
+                                    transition: 'all 0.2s ease',
+                                    minHeight: '60px'
                                 }}
                             >
-                                <div>
-                                    <div style={{ fontWeight: '600', color: attendance[member.id] ? 'var(--accent)' : 'var(--secondary)' }}>{member.name}</div>
-                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{member.email}</div>
+                                <div style={{ minWidth: 0, flex: 1 }}>
+                                    <div style={{
+                                        fontWeight: '600',
+                                        color: attendance[member.id] ? 'var(--accent)' : 'var(--secondary)',
+                                        fontSize: '0.9rem',
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis'
+                                    }}>
+                                        {member.name}
+                                    </div>
                                 </div>
                                 <div style={{
-                                    width: '28px',
-                                    height: '28px',
-                                    borderRadius: '8px',
+                                    width: '24px',
+                                    height: '24px',
+                                    borderRadius: '6px',
                                     border: '2px solid',
                                     borderColor: attendance[member.id] ? 'var(--accent)' : 'rgba(0,0,0,0.1)',
                                     background: attendance[member.id] ? 'var(--accent)' : 'white',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    transition: 'all 0.2s ease'
+                                    transition: 'all 0.2s ease',
+                                    flexShrink: 0,
+                                    marginLeft: '0.5rem'
                                 }}>
-                                    {attendance[member.id] && <Check size={18} color="white" strokeWidth={3} />}
+                                    {attendance[member.id] && <Check size={16} color="white" strokeWidth={3} />}
                                 </div>
                             </motion.div>
                         ))}

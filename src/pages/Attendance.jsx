@@ -99,12 +99,13 @@ const Attendance = () => {
     };
 
     return (
-        <div className="container" style={{ padding: '4rem 2rem' }}>
+        <div className="container" style={{ padding: '2rem 1rem' }}>
+
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
             >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
+                <div className="mobile-stack" style={{ justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2.5rem', gap: '1.5rem' }}>
                     <div>
                         <button
                             onClick={() => navigate('/admin')}
@@ -124,11 +125,11 @@ const Attendance = () => {
                         >
                             <ArrowLeft size={16} /> Admin Dashboard
                         </button>
-                        <h1 style={{ fontSize: '2.5rem', margin: 0 }}>Attendance Log</h1>
+                        <h1 style={{ fontSize: '2.5rem', margin: 0, lineHeight: 1.2 }}>Attendance Log</h1>
                         <p style={{ color: 'var(--text-muted)', marginTop: '0.25rem' }}>View and manage historical rehearsal attendance.</p>
                     </div>
-                    <div>
-                        <button onClick={() => setIsAddModalOpen(true)} className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <div style={{ alignSelf: 'flex-start' }}>
+                        <button onClick={() => setIsAddModalOpen(true)} className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', width: '100%', justifyContent: 'center' }}>
                             <Plus size={18} /> New Rehearsal
                         </button>
                     </div>
@@ -160,8 +161,8 @@ const Attendance = () => {
                                 <motion.div
                                     key={rehearsal.id}
                                     whileHover={{ y: -4 }}
-                                    className="glass-card"
-                                    style={{ padding: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                                    className="glass-card mobile-stack"
+                                    style={{ padding: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1.5rem' }}
                                 >
                                     <div style={{ flex: 1 }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
@@ -187,11 +188,11 @@ const Attendance = () => {
                                             )}
                                         </div>
                                     </div>
-                                    <div style={{ display: 'flex', gap: '1rem', marginLeft: '2rem' }}>
+                                    <div style={{ display: 'flex', gap: '1rem' }}>
                                         <button
                                             onClick={() => navigate(`/admin/attendance/${rehearsal.date}`)}
                                             className="btn-outline"
-                                            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.2rem' }}
+                                            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.2rem', flex: 1, justifyContent: 'center' }}
                                         >
                                             <Edit2 size={16} /> Edit
                                         </button>
@@ -205,7 +206,8 @@ const Attendance = () => {
                                                 borderRadius: '8px',
                                                 cursor: 'pointer',
                                                 display: 'flex',
-                                                alignItems: 'center'
+                                                alignItems: 'center',
+                                                justifyContent: 'center'
                                             }}
                                         >
                                             <Trash2 size={18} />

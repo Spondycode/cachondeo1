@@ -216,7 +216,7 @@ const Admin = () => {
                 return (
                     <div>
                         <h2 style={{ marginBottom: '1.5rem', color: 'var(--secondary)' }}>Add New Member</h2>
-                        <form onSubmit={handleAddMember} className="admin-form" style={{ gap: '1rem', marginBottom: '2rem' }}>
+                        <form onSubmit={handleAddMember} className="responsive-grid" style={{ '--grid-cols': '1fr 1fr', gap: '1rem', marginBottom: '2rem' }}>
                             <input
                                 type="text"
                                 placeholder="Full Name"
@@ -260,7 +260,7 @@ const Admin = () => {
                                 required
                                 style={{ padding: '0.8rem', borderRadius: '4px', border: '1px solid var(--glass-border)' }}
                             />
-                            <button type="submit" className="btn-primary" style={{ gridColumn: 'span 2', padding: '0.8rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                            <button type="submit" className="btn-primary" style={{ gridColumn: '1 / -1', padding: '0.8rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
                                 <Plus size={20} /> Add Member
                             </button>
                         </form>
@@ -270,15 +270,16 @@ const Admin = () => {
                             {members.length > 0 && (
                                 <div className="member-grid-layout member-list-header" style={{
                                     display: 'grid',
-                                    gridTemplateColumns: 'minmax(150px, 1fr) minmax(200px, 1.5fr) minmax(130px, 1fr) 100px 80px',
+                                    gridTemplateColumns: 'minmax(120px, 1fr) minmax(180px, 1.5fr) minmax(110px, 1fr) 90px 80px',
                                     alignItems: 'center',
                                     gap: '1rem',
                                     padding: '0 1rem',
-                                    fontSize: '0.8rem',
+                                    fontSize: '0.75rem',
                                     color: 'var(--text-muted)',
                                     fontWeight: '600',
                                     textTransform: 'uppercase',
-                                    letterSpacing: '1px'
+                                    letterSpacing: '0.5px',
+                                    marginBottom: '0.5rem'
                                 }}>
                                     <div>Name</div>
                                     <div>Email</div>
@@ -287,76 +288,110 @@ const Admin = () => {
                                     <div style={{ textAlign: 'right' }}>Actions</div>
                                 </div>
                             )}
-                            {members
-                                .sort((a, b) => {
-                                    const voiceOrder = { 'Soprano': 1, 'Alto': 2, 'Tenor': 3, 'Bass': 4, 'Other': 5 };
-                                    const orderA = voiceOrder[a.voicePart] || 6;
-                                    const orderB = voiceOrder[b.voicePart] || 6;
+                            {(() => {
+                                const voiceParts = ['Soprano', 'Alto', 'Tenor', 'Bass', 'Other'];
+                                const grouped = members.reduce((acc, m) => {
+                                    const part = m.voicePart || 'Other';
+                                    if (!acc[part]) acc[part] = [];
+                                    acc[part].push(m);
+                                    return acc;
+                                }, {});
 
-                                    if (orderA !== orderB) return orderA - orderB;
-                                    return (a.name || '').localeCompare(b.name || '');
-                                })
-                                .map(member => (
-                                    <div key={member.id} className="admin-list-card" style={{ padding: '1rem', background: 'var(--white)', borderRadius: '4px', border: '1px solid var(--glass-border)' }}>
-                                        <div className="member-grid-layout" style={{ display: 'grid', gridTemplateColumns: 'minmax(150px, 1fr) minmax(200px, 1.5fr) minmax(130px, 1fr) 100px 80px', alignItems: 'center', gap: '1rem', width: '100%' }}>
-                                            <div style={{ fontWeight: '600', color: 'var(--secondary)' }}>{member.name || 'No Name'}</div>
-                                            <div style={{ color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{member.email}</div>
-                                            <div style={{ textAlign: 'center' }}>
-                                                {currentUser?.isSuperAdmin ? (
-                                                    <select
-                                                        value={member.role || (member.email === 'spondycodedev@gmail.com' ? 'superadmin' : 'member')}
-                                                        onChange={(e) => handleUpdateRole(member.id, e.target.value)}
-                                                        style={{
-                                                            padding: '0.2rem 0.4rem',
-                                                            borderRadius: '4px',
-                                                            border: '1px solid var(--glass-border)',
-                                                            fontSize: '0.8rem',
-                                                            background: 'white'
-                                                        }}
-                                                    >
-                                                        <option value="member">Member</option>
-                                                        <option value="admin">Admin</option>
-                                                        <option value="superadmin">Super Admin</option>
-                                                    </select>
-                                                ) : (
-                                                    <span style={{
-                                                        fontSize: '0.8rem',
-                                                        color: 'var(--text-muted)',
-                                                        textTransform: 'capitalize'
-                                                    }}>
-                                                        {member.role || (member.email === 'spondycodedev@gmail.com' ? 'superadmin' : 'member')}
-                                                    </span>
-                                                )}
-                                            </div>
+                                return voiceParts.map(part => {
+                                    const partMembers = grouped[part] || [];
+                                    if (partMembers.length === 0) return null;
+
+                                    // Sort alphabetically by name
+                                    const sortedMembers = [...partMembers].sort((a, b) =>
+                                        (a.name || '').localeCompare(b.name || '')
+                                    );
+
+                                    return (
+                                        <div key={part} style={{ marginBottom: '2rem' }}>
                                             <div style={{
-                                                padding: '0.2rem 0.6rem',
-                                                borderRadius: '20px',
-                                                fontSize: '0.8rem',
-                                                background: 'var(--accent-light)',
-                                                color: 'var(--secondary)',
-                                                textAlign: 'center'
+                                                padding: '0.5rem 1rem',
+                                                background: 'rgba(var(--secondary-rgb, 43, 45, 66), 0.05)',
+                                                borderRadius: '4px',
+                                                marginBottom: '1rem',
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                alignItems: 'center',
+                                                borderLeft: '4px solid var(--accent)'
                                             }}>
-                                                {member.voicePart || 'Unassigned'}
+                                                <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                                                    {part}
+                                                </h3>
+                                                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '600' }}>
+                                                    {sortedMembers.length} {sortedMembers.length === 1 ? 'member' : 'members'}
+                                                </span>
                                             </div>
-                                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                                                <button
-                                                    onClick={() => setEditingMember(member)}
-                                                    style={{ color: 'var(--secondary)', background: 'none', border: 'none', cursor: 'pointer' }}
-                                                    title="Edit Member"
-                                                >
-                                                    <Edit2 size={18} />
-                                                </button>
-                                                <button
-                                                    onClick={() => removeMember(member.id)}
-                                                    style={{ color: 'red', background: 'none', border: 'none', cursor: 'pointer' }}
-                                                    title="Remove Member"
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
+                                            <div style={{ display: 'grid', gap: '0.75rem' }}>
+                                                {sortedMembers.map(member => (
+                                                    <div key={member.id} className="admin-list-card" style={{ padding: '0.75rem', background: 'var(--white)', borderRadius: '4px', border: '1px solid var(--glass-border)' }}>
+                                                        <div className="member-grid-layout" style={{ display: 'grid', gridTemplateColumns: 'minmax(120px, 1fr) minmax(180px, 1.5fr) minmax(110px, 1fr) 90px 80px', alignItems: 'center', gap: '1rem', width: '100%' }}>
+                                                            <div style={{ fontWeight: '600', color: 'var(--secondary)' }}>{member.name || 'No Name'}</div>
+                                                            <div style={{ color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{member.email}</div>
+                                                            <div style={{ textAlign: 'center' }}>
+                                                                {currentUser?.isSuperAdmin ? (
+                                                                    <select
+                                                                        value={member.role || (member.email === 'spondycodedev@gmail.com' ? 'superadmin' : 'member')}
+                                                                        onChange={(e) => handleUpdateRole(member.id, e.target.value)}
+                                                                        style={{
+                                                                            padding: '0.2rem 0.4rem',
+                                                                            borderRadius: '4px',
+                                                                            border: '1px solid var(--glass-border)',
+                                                                            fontSize: '0.8rem',
+                                                                            background: 'white'
+                                                                        }}
+                                                                    >
+                                                                        <option value="member">Member</option>
+                                                                        <option value="admin">Admin</option>
+                                                                        <option value="superadmin">Super Admin</option>
+                                                                    </select>
+                                                                ) : (
+                                                                    <span style={{
+                                                                        fontSize: '0.8rem',
+                                                                        color: 'var(--text-muted)',
+                                                                        textTransform: 'capitalize'
+                                                                    }}>
+                                                                        {member.role || (member.email === 'spondycodedev@gmail.com' ? 'superadmin' : 'member')}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                            <div style={{
+                                                                padding: '0.2rem 0.6rem',
+                                                                borderRadius: '20px',
+                                                                fontSize: '0.8rem',
+                                                                background: 'var(--accent-light)',
+                                                                color: 'var(--secondary)',
+                                                                textAlign: 'center'
+                                                            }}>
+                                                                {member.voicePart || 'Unassigned'}
+                                                            </div>
+                                                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                                                                <button
+                                                                    onClick={() => setEditingMember(member)}
+                                                                    style={{ color: 'var(--secondary)', background: 'none', border: 'none', cursor: 'pointer' }}
+                                                                    title="Edit Member"
+                                                                >
+                                                                    <Edit2 size={18} />
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => removeMember(member.id)}
+                                                                    style={{ color: 'red', background: 'none', border: 'none', cursor: 'pointer' }}
+                                                                    title="Remove Member"
+                                                                >
+                                                                    <Trash2 size={18} />
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                });
+                            })()}
                             {members.length === 0 && <p style={{ color: 'var(--text-muted)' }}>No members added yet.</p>}
                         </div>
                     </div>
@@ -366,7 +401,7 @@ const Admin = () => {
                     <div>
                         <h2 style={{ marginBottom: '1.5rem', color: 'var(--secondary)' }}>Add New Song</h2>
                         <form onSubmit={handleAddSong} style={{ display: 'grid', gap: '1rem', marginBottom: '3rem' }}>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                            <div className="responsive-grid" style={{ '--grid-cols': '1fr 1fr', gap: '1rem' }}>
                                 <input
                                     type="text"
                                     placeholder="Song Title"
@@ -384,7 +419,7 @@ const Admin = () => {
                                     style={{ padding: '0.8rem', borderRadius: '4px', border: '1px solid var(--glass-border)' }}
                                 />
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                            <div className="responsive-grid" style={{ '--grid-cols': '1fr 1fr', gap: '1rem' }}>
                                 <input
                                     type="text"
                                     placeholder="PDF URL"
@@ -414,12 +449,12 @@ const Admin = () => {
                         <h2 style={{ marginBottom: '1.5rem', color: 'var(--secondary)' }}>Current Repertoire</h2>
                         <div style={{ display: 'grid', gap: '1rem' }}>
                             {songs.map(song => (
-                                <div key={song.id} className="admin-list-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', background: 'var(--white)', borderRadius: '4px', border: '1px solid var(--glass-border)' }}>
-                                    <div>
+                                <div key={song.id} className="admin-list-card mobile-stack" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', background: 'var(--white)', borderRadius: '4px', border: '1px solid var(--glass-border)', gap: '1rem' }}>
+                                    <div style={{ flex: 1 }}>
                                         <strong style={{ color: 'var(--secondary)' }}>{song.title}</strong>
                                         <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{song.composer}</div>
                                     </div>
-                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
                                         <button
                                             onClick={() => navigate(`/admin/edit-song/${song.id}`)}
                                             style={{ color: 'var(--secondary)', background: 'none', border: 'none', cursor: 'pointer' }}
@@ -443,8 +478,8 @@ const Admin = () => {
                         <div style={{ display: 'grid', gap: '1rem' }}>
                             {messages.map(msg => (
                                 <div key={msg.id} className="admin-list-card" style={{ padding: '1rem', background: 'var(--white)', borderRadius: '4px', border: '1px solid var(--glass-border)' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                                        <span style={{ fontWeight: '600', color: 'var(--secondary)' }}>From: {msg.email}</span>
+                                    <div className="mobile-stack" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', gap: '0.5rem' }}>
+                                        <span style={{ fontWeight: '600', color: 'var(--secondary)', wordBreak: 'break-all' }}>From: {msg.email}</span>
                                         <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                                             {msg.timestamp?.seconds ? new Date(msg.timestamp.seconds * 1000).toLocaleString() : 'Just now'}
                                         </span>
@@ -476,7 +511,7 @@ const Admin = () => {
                 animate={{ opacity: 1, y: 0 }}
                 style={{ marginBottom: '3rem' }}
             >
-                <h1 style={{ fontSize: '3rem', marginBottom: '1rem', color: 'var(--secondary)' }}>ADMIN DASHBOARD</h1>
+                <h1 style={{ fontSize: 'clamp(2rem, 8vw, 3.5rem)', marginBottom: '1rem', color: 'var(--secondary)' }}>ADMIN DASHBOARD</h1>
                 <p style={{ color: 'var(--text-muted)' }}>Manage choir members and repertoire.</p>
                 <div style={{ width: '100px', height: '2px', background: 'var(--accent)', marginTop: '1.5rem' }}></div>
             </motion.div>
@@ -494,40 +529,36 @@ const Admin = () => {
                 </div>
             )}
 
-            <div className="admin-nav-buttons" style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
+            <div className="admin-nav-grid" style={{ marginBottom: '2rem' }}>
                 <button
                     onClick={() => setActiveTab('members')}
-                    className={activeTab === 'members' ? 'btn-primary' : 'btn-outline'}
-                    style={{ flex: '1 1 200px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                    className={`admin-nav-item ${activeTab === 'members' ? 'btn-primary' : 'btn-outline'}`}
                 >
                     <Users size={20} /> Members
                 </button>
                 <button
                     onClick={() => setActiveTab('songs')}
-                    className={activeTab === 'songs' ? 'btn-primary' : 'btn-outline'}
-                    style={{ flex: '1 1 200px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                    className={`admin-nav-item ${activeTab === 'songs' ? 'btn-primary' : 'btn-outline'}`}
                 >
                     <Music size={20} /> Repertoire
                 </button>
                 <button
                     onClick={() => setActiveTab('messages')}
-                    className={activeTab === 'messages' ? 'btn-primary' : 'btn-outline'}
-                    style={{ flex: '1 1 200px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                    className={`admin-nav-item ${activeTab === 'messages' ? 'btn-primary' : 'btn-outline'}`}
                 >
                     <MessageSquare size={20} /> Messages
                 </button>
 
                 <button
                     onClick={() => navigate('/admin/attendance')}
-                    className="btn-outline"
-                    style={{ flex: '1 1 200px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                    className="admin-nav-item btn-outline"
                 >
                     <Calendar size={20} /> Attendance
                 </button>
             </div>
 
 
-            <div className="glass-card" style={{ padding: '2rem' }}>
+            <div className="admin-content-container glass-card" style={{ padding: 'var(--container-padding, 2rem)' }}>
                 {renderTabContent()}
             </div>
 

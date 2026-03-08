@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { User, Mail, Lock, Music, ArrowRight, Loader2 } from 'lucide-react';
+import { User, Mail, Lock, Music, ArrowRight, Loader2, Phone } from 'lucide-react';
 import { auth, db } from '../firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
@@ -10,6 +10,7 @@ const SignUp = () => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
+        phone: '',
         password: '',
         voicePart: 'Soprano'
     });
@@ -40,6 +41,7 @@ const SignUp = () => {
                 uid: user.uid,
                 name: formData.name,
                 email: formData.email,
+                phone: formData.phone,
                 voicePart: formData.voicePart,
                 role: 'member',
                 createdAt: new Date().toISOString()
@@ -146,6 +148,28 @@ const SignUp = () => {
                             value={formData.email}
                             onChange={handleChange}
                             placeholder="john@example.com"
+                            style={{
+                                width: '100%',
+                                padding: '0.75rem',
+                                borderRadius: '8px',
+                                border: '1px solid var(--glass-border)',
+                                background: 'rgba(255, 255, 255, 0.05)',
+                                color: 'var(--text-main)',
+                                outline: 'none'
+                            }}
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '500' }}>
+                            <Phone size={16} /> Phone Number
+                        </label>
+                        <input
+                            type="tel"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleChange}
+                            placeholder="+XX XXX XXX XXX"
                             style={{
                                 width: '100%',
                                 padding: '0.75rem',

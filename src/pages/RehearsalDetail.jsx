@@ -97,19 +97,21 @@ const RehearsalDetail = () => {
                                     </span>
                                 </div>
                             </div>
-                            {isAdmin && (
+                        </div>
+                    </div>
+
+                    <div className="glass-card" style={{ padding: '2rem' }}>
+                        {isAdmin && (
+                            <div style={{ marginBottom: '2rem' }}>
                                 <button
                                     onClick={() => navigate('/admin/edit-rehearsal')}
                                     className="btn-primary"
                                     style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.8rem 1.5rem' }}
                                 >
-                                    <Edit2 size={18} /> Edit Rehearsal
+                                    <Edit2 size={18} /> Edit Rehearsal Content
                                 </button>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="glass-card" style={{ padding: '2rem' }}>
+                            </div>
+                        )}
                         <div className="responsive-grid" style={{ '--grid-cols': '1.5fr 1fr' }}>
                             {/* Main Info */}
                             <div>

@@ -8,7 +8,9 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const { login, user } = useAuth();
+    const [errorCode, setErrorCode] = useState('');
+    const [resetSent, setResetSent] = useState(false);
+    const { login, resetPassword, user } = useAuth();
     const navigate = useNavigate();
 
     const [isLoading, setIsLoading] = useState(false);
@@ -24,6 +26,8 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+        setErrorCode('');
+        setResetSent(false);
         setIsLoading(true);
         setIsLoggingIn(true);
 
@@ -39,6 +43,7 @@ const Login = () => {
                 }
             } else {
                 setError(result.error || 'Invalid login credentials.');
+                setErrorCode(result.code || '');
                 setIsLoggingIn(false);
             }
         } catch (err) {
@@ -47,6 +52,23 @@ const Login = () => {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const handleResetPassword = async () => {
+        if (!email) {
+            setError("Please enter your email address first.");
+            return;
+        }
+
+        setIsLoading(true);
+        const result = await resetPassword(email);
+        if (result.success) {
+            setResetSent(true);
+            setError('');
+        } else {
+            setError(result.error);
+        }
+        setIsLoading(false);
     };
 
     return (
@@ -79,9 +101,45 @@ const Login = () => {
                         padding: '1rem',
                         borderRadius: '4px',
                         marginBottom: '1.5rem',
+                        fontSize: '0.8rem',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '0.75rem'
+                    }}>
+                        <div>{error}</div>
+                        {(errorCode === 'auth/wrong-password' || errorCode === 'auth/invalid-credential') && (
+                            <button
+                                type="button"
+                                onClick={handleResetPassword}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    color: 'var(--accent)',
+                                    textDecoration: 'underline',
+                                    cursor: 'pointer',
+                                    fontSize: '0.8rem',
+                                    textAlign: 'left',
+                                    padding: 0,
+                                    width: 'fit-content'
+                                }}
+                            >
+                                Forgotten your password? Reset it here.
+                            </button>
+                        )}
+                    </div>
+                )}
+
+                {resetSent && (
+                    <div style={{
+                        background: 'rgba(0, 128, 0, 0.1)',
+                        border: '1px solid rgba(0, 128, 0, 0.2)',
+                        color: '#4caf50',
+                        padding: '1rem',
+                        borderRadius: '4px',
+                        marginBottom: '1.5rem',
                         fontSize: '0.8rem'
                     }}>
-                        {error}
+                        Password reset email sent! Please check your inbox.
                     </div>
                 )}
 
