@@ -43,6 +43,7 @@ export const AuthProvider = ({ children }) => {
                     setUser({
                         uid: firebaseUser.uid,
                         email: firebaseUser.email,
+                        name: 'Choir Member',
                         isAdmin: isSuperAdmin,
                         isSuperAdmin: isSuperAdmin,
                         role: isSuperAdmin ? 'superadmin' : 'member'

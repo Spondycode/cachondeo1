@@ -4,6 +4,7 @@ import { Music, FileText, ArrowLeft, Download, Info, Headphones } from 'lucide-r
 import { motion } from 'framer-motion';
 import { db } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
+import CommentSection from '../components/CommentSection';
 
 const SongDetail = () => {
     const { id } = useParams();
@@ -142,6 +143,8 @@ const SongDetail = () => {
                         </div>
                     </div>
                 </div>
+
+                <CommentSection songId={id} />
             </motion.div>
         </div>
     );

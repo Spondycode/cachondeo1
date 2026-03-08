@@ -55,6 +55,12 @@ service cloud.firestore {
       allow read, delete: if isAdmin();
     }
 
+    // Comments: Signed-in users can read and create; users and admins can update/delete
+    match /comments/{commentId} {
+      allow read, create: if isSignedIn();
+      allow update, delete: if isSignedIn() && (request.auth.uid == resource.data.userId || isAdmin());
+    }
+
     // Lock down everything else
     match /{document=**} {
       allow read, write: if false;
