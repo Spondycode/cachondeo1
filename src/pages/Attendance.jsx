@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, X, Save, Plus, ArrowLeft, Calendar, Users, Trash2, ChevronRight, Edit2 } from 'lucide-react';
+import { Check, X, Save, Plus, ArrowLeft, Calendar, Users, Trash2, ChevronRight, Edit2, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db } from '../firebase';
 import {
@@ -98,6 +98,36 @@ const Attendance = () => {
         return members.filter(m => dayAttendance[m.id]);
     };
 
+    const handleDownloadCSV = (rehearsal) => {
+        const rows = [
+            ['Name', 'Email', 'Voice Part', 'Phone', 'Attended']
+        ];
+        
+        const sortedMembers = [...members].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+        
+        sortedMembers.forEach(m => {
+            const attended = rehearsal.attendance?.[m.id] ? 'Yes' : 'No';
+            rows.push([
+                `"${m.name || ''}"`,
+                `"${m.email || ''}"`,
+                `"${m.voicePart || ''}"`,
+                `"${m.phone || ''}"`,
+                attended
+            ]);
+        });
+
+        const csvContent = rows.map(e => e.join(',')).join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `Attendance_${rehearsal.date}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     return (
         <div className="container" style={{ padding: '2rem 1rem' }}>
 
@@ -188,29 +218,49 @@ const Attendance = () => {
                                             )}
                                         </div>
                                     </div>
-                                    <div style={{ display: 'flex', gap: '1rem' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', minWidth: '130px', alignSelf: 'stretch' }}>
+                                        <div style={{ display: 'flex', gap: '0.5rem', width: '100%' }}>
+                                            <button
+                                                onClick={() => navigate(`/admin/attendance/${rehearsal.date}`)}
+                                                className="btn-outline"
+                                                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1rem', flex: 1, justifyContent: 'center' }}
+                                            >
+                                                <Edit2 size={16} /> Edit
+                                            </button>
+                                            <button
+                                                onClick={() => removeWeek(rehearsal.date)}
+                                                style={{
+                                                    color: '#ef4444',
+                                                    background: 'rgba(239, 68, 68, 0.05)',
+                                                    border: '1px solid rgba(239, 68, 68, 0.2)',
+                                                    padding: '0.6rem',
+                                                    borderRadius: '8px',
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center'
+                                                }}
+                                                title="Delete Rehearsal"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
                                         <button
-                                            onClick={() => navigate(`/admin/attendance/${rehearsal.date}`)}
+                                            onClick={() => handleDownloadCSV(rehearsal)}
                                             className="btn-outline"
-                                            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.2rem', flex: 1, justifyContent: 'center' }}
-                                        >
-                                            <Edit2 size={16} /> Edit
-                                        </button>
-                                        <button
-                                            onClick={() => removeWeek(rehearsal.date)}
                                             style={{
-                                                color: '#ef4444',
-                                                background: 'rgba(239, 68, 68, 0.05)',
-                                                border: '1px solid rgba(239, 68, 68, 0.2)',
-                                                padding: '0.6rem',
-                                                borderRadius: '8px',
-                                                cursor: 'pointer',
                                                 display: 'flex',
                                                 alignItems: 'center',
-                                                justifyContent: 'center'
+                                                gap: '0.5rem',
+                                                padding: '0.6rem 1rem',
+                                                width: '100%',
+                                                justifyContent: 'center',
+                                                color: '#e11d48',
+                                                borderColor: 'rgba(225, 29, 72, 0.3)',
+                                                marginTop: 'auto'
                                             }}
                                         >
-                                            <Trash2 size={18} />
+                                            <Download size={16} /> Download
                                         </button>
                                     </div>
                                 </motion.div>
