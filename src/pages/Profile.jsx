@@ -113,7 +113,7 @@ const Profile = () => {
                         {message.type === 'warning' && (
                             <div style={{ textAlign: 'center' }}>
                                 <a
-                                    href="https://pr.tn/ref/20MQFKD0"
+                                    href="https://proton.me/pass"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="btn-primary"
