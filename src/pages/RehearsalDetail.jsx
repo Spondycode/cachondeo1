@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
+import CommentSection from '../components/CommentSection';
 
 const defaultRehearsal = {
     date: "Thursday, March 5, 2026",
@@ -181,6 +182,8 @@ const RehearsalDetail = () => {
                         </div>
                     </div>
                 </div>
+
+                <CommentSection rehearsalId="next_rehearsal" />
             </motion.div>
         </div>
     );

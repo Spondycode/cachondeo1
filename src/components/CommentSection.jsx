@@ -18,7 +18,11 @@ import { useAuth } from '../context/AuthContext';
 import { MessageSquare, Send, Reply, User, Edit2, Trash2, X, Check, Trash } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const CommentSection = ({ songId }) => {
+const CommentSection = ({ songId, rehearsalId }) => {
+    const targetId = songId || rehearsalId;
+    const targetField = songId ? 'songId' : 'rehearsalId';
+    const itemType = songId ? 'song' : 'rehearsal';
+
     const { user } = useAuth();
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
@@ -31,11 +35,11 @@ const CommentSection = ({ songId }) => {
     const isAdmin = user?.role === 'superadmin' || user?.role === 'admin';
 
     useEffect(() => {
-        if (!songId) return;
+        if (!targetId) return;
 
         const q = query(
             collection(db, 'comments'),
-            where('songId', '==', songId)
+            where(targetField, '==', targetId)
         );
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -76,7 +80,7 @@ const CommentSection = ({ songId }) => {
         });
 
         return () => unsubscribe();
-    }, [songId]);
+    }, [targetId, targetField]);
 
     const handlePostComment = async (e) => {
         e.preventDefault();
@@ -87,7 +91,7 @@ const CommentSection = ({ songId }) => {
 
         try {
             await addDoc(collection(db, 'comments'), {
-                songId,
+                [targetField]: targetId,
                 userId: user.uid,
                 userName: user.name || 'Choir Member',
                 content: newComment,
@@ -112,7 +116,7 @@ const CommentSection = ({ songId }) => {
 
         try {
             await addDoc(collection(db, 'comments'), {
-                songId,
+                [targetField]: targetId,
                 userId: user.uid,
                 userName: user.name || 'Choir Member',
                 content: replyContent,
@@ -185,14 +189,14 @@ const CommentSection = ({ songId }) => {
     };
 
     const handleDeleteAll = async () => {
-        if (!window.confirm("WARNING: This will delete ALL comments and replies for this song. This action cannot be undone. Are you sure?")) return;
+        if (!window.confirm(`WARNING: This will delete ALL comments and replies for this ${itemType}. This action cannot be undone. Are you sure?`)) return;
 
         setSubmitting(true);
         setError(null);
         try {
             const q = query(
                 collection(db, 'comments'),
-                where('songId', '==', songId)
+                where(targetField, '==', targetId)
             );
             const snapshot = await getDocs(q);
 
@@ -227,7 +231,7 @@ const CommentSection = ({ songId }) => {
                         className="btn-admin-delete-all"
                         onClick={handleDeleteAll}
                         disabled={submitting}
-                        title="Delete All Messages for this song"
+                        title={`Delete All Messages for this ${itemType}`}
                     >
                         <Trash size={16} /> Delete all Comments
                     </button>

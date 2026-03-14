@@ -4,8 +4,10 @@ import { Music, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { db } from '../firebase';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { useAuth } from '../context/AuthContext';
 
 const PublicRepertoire = () => {
+    const { user } = useAuth();
     const [songs, setSongs] = useState([]);
 
     useEffect(() => {
@@ -44,40 +46,73 @@ const PublicRepertoire = () => {
 
                     <div style={{ display: 'grid', gap: '1.5rem', maxWidth: '800px' }}>
                         {songs.length > 0 ? (
-                            songs.map((song, index) => (
-                                <motion.div
-                                    key={song.id}
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: index * 0.1 }}
-                                    className="glass-card"
-                                    style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '1.5rem',
-                                        padding: '1.5rem 2rem',
-                                        background: 'rgba(255, 255, 255, 0.7)',
-                                        border: '1px solid rgba(0, 119, 190, 0.1)'
-                                    }}
-                                >
-                                    <div style={{
-                                        width: '48px',
-                                        height: '48px',
-                                        borderRadius: '12px',
-                                        background: 'var(--secondary)',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        color: 'white'
-                                    }}>
-                                        <Music size={24} />
-                                    </div>
-                                    <div>
-                                        <h3 style={{ fontSize: '1.25rem', marginBottom: '0.25rem', color: 'var(--text-main)' }}>{song.title}</h3>
-                                        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: '500' }}>{song.composer}</p>
-                                    </div>
-                                </motion.div>
-                            ))
+                            songs.map((song, index) => {
+                                const cardContent = (
+                                    <>
+                                        <div style={{
+                                            width: '48px',
+                                            height: '48px',
+                                            borderRadius: '12px',
+                                            background: 'var(--secondary)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            color: 'white',
+                                            flexShrink: 0
+                                        }}>
+                                            <Music size={24} />
+                                        </div>
+                                        <div>
+                                            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.25rem', color: 'var(--text-main)' }}>{song.title}</h3>
+                                            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: '500' }}>{song.composer}</p>
+                                        </div>
+                                    </>
+                                );
+
+                                const cardStyle = {
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '1.5rem',
+                                    padding: '1.5rem 2rem',
+                                    background: 'rgba(255, 255, 255, 0.7)',
+                                    border: '1px solid rgba(0, 119, 190, 0.1)',
+                                    textDecoration: 'none',
+                                    color: 'inherit',
+                                    width: '100%',
+                                    boxSizing: 'border-box'
+                                };
+
+                                return (
+                                    <motion.div
+                                        key={song.id}
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: index * 0.1 }}
+                                    >
+                                        {user ? (
+                                            <Link
+                                                to={`/members/song/${song.id}`}
+                                                className="glass-card"
+                                                style={{ ...cardStyle, transition: 'transform 0.2s, box-shadow 0.2s' }}
+                                                onMouseEnter={(e) => {
+                                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                                    e.currentTarget.style.boxShadow = '0 10px 25px rgba(0,0,0,0.05)';
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    e.currentTarget.style.transform = 'none';
+                                                    e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                                                }}
+                                            >
+                                                {cardContent}
+                                            </Link>
+                                        ) : (
+                                            <div className="glass-card" style={cardStyle}>
+                                                {cardContent}
+                                            </div>
+                                        )}
+                                    </motion.div>
+                                );
+                            })
                         ) : (
                             <p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '3rem' }}>No songs found in our current repertoire.</p>
                         )}
