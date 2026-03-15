@@ -7,7 +7,7 @@ import {
     updatePassword,
     sendPasswordResetEmail
 } from 'firebase/auth';
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const AuthContext = createContext();
 
@@ -60,7 +60,19 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password) => {
         try {
-            await signInWithEmailAndPassword(auth, email, password);
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            
+            // Log the login
+            try {
+                await addDoc(collection(db, 'loginLogs'), {
+                    uid: userCredential.user.uid,
+                    email: userCredential.user.email,
+                    timestamp: serverTimestamp()
+                });
+            } catch (logError) {
+                console.error("Failed to write login log:", logError);
+            }
+            
             return { success: true };
         } catch (error) {
             console.error("Login failed:", error.code, error.message);

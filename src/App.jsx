@@ -17,6 +17,7 @@ import Profile from './pages/Profile';
 import PublicRepertoire from './pages/PublicRepertoire';
 import Attendance from './pages/Attendance';
 import AttendanceEdit from './pages/AttendanceEdit';
+import LoginLogs from './pages/LoginLogs';
 
 import SignUp from './pages/SignUp';
 import Contact from './pages/Contact';
@@ -104,6 +105,14 @@ function App() {
                 element={
                   <AdminRoute>
                     <AttendanceEdit />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/login-logs"
+                element={
+                  <AdminRoute>
+                    <LoginLogs />
                   </AdminRoute>
                 }
               />

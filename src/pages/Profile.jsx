@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { User, Save, X, ArrowLeft, Key, Music, AlertTriangle, Lock } from 'lucide-react';
+import { User, Save, X, ArrowLeft, Key, Music, AlertTriangle, Lock, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 
@@ -220,6 +220,33 @@ const Profile = () => {
                     </div>
 
                     <div style={{ height: '1px', background: 'var(--glass-border)', margin: '1rem 0' }}></div>
+
+                    {user?.isSuperAdmin && (
+                        <>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                <Activity size={18} color="var(--secondary)" />
+                                <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Super Admin Tools</h3>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => navigate('/admin/login-logs')}
+                                className="btn-outline"
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '0.5rem',
+                                    padding: '0.8rem',
+                                    borderColor: 'var(--accent)',
+                                    color: 'var(--accent)',
+                                    marginBottom: '1rem'
+                                }}
+                            >
+                                <Activity size={18} /> View Login Logs
+                            </button>
+                            <div style={{ height: '1px', background: 'var(--glass-border)', margin: '1rem 0' }}></div>
+                        </>
+                    )}
 
                     {/* Password Change */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>

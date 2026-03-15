@@ -61,6 +61,12 @@ service cloud.firestore {
       allow update, delete: if isSignedIn() && (request.auth.uid == resource.data.userId || isAdmin());
     }
 
+    // Login Logs: Anyone can create; admins can read
+    match /loginLogs/{logId} {
+      allow create: if true;
+      allow read: if isAdmin();
+    }
+
     // Lock down everything else
     match /{document=**} {
       allow read, write: if false;
